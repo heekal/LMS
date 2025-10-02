@@ -11,11 +11,11 @@ Tubes DevSecOps
   ```npm create vite@latest lms-fe -- --template react```
 
   Step 3. Jangan pakai rolldown-vite </br>
-  ```Use rolldown-vite (Experimental)?```
+  ```Use rolldown-vite (Experimental)?``` </br>
   pilih dengan _NO_ pakai arrow key </br>
   ```No```
 
   Step 4. Biar langsung ke run </br>
-  ```Install with npm and start now?````
-  pilih dengan _YES_ dengan arrow key
+  ```Install with npm and start now?``` </br>
+  pilih dengan _YES_ dengan arrow key </br>
   ```Yes```
