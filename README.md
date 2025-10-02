@@ -4,7 +4,7 @@ Learning Management System menggunakan react, tailwindcss, dan electron.js </br>
 
 ## INSTALASI: 
 
-### Install VITE Frontend </br>
+### Install VITE Frontend
   1. masuk ke dir /LMS </br>
   ```cd /LMS```
 
@@ -20,3 +20,6 @@ Learning Management System menggunakan react, tailwindcss, dan electron.js </br>
   ```Install with npm and start now?``` </br>
   pilih dengan __YES__ dengan arrow key </br>
   ```Yes```
+
+### Install Electron Backend
+*Subject To Be Changed*
