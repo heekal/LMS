@@ -8,7 +8,7 @@ export default function Navbar({ children }) {
       <div className="flex flex-col h-screen w-[265px] relative border-r border-stone-200 bg-[#FDFAF6] "> {/* 265 px */}
         <div className="flex flex-row border-b border-stone-200 pt-4 pb-3 pl-4">
           <h1 className="pl-1 pr-1 text-lg">📂</h1>
-          <h1 className="font-regular text-lg text-stone-800 pl-2">Your Workspace</h1>
+          <h1 className="font-regular text-lg font-bold text-stone-800 pl-2">Your Workspace</h1>
         </div>
         <ul className="pt-3">{children}</ul>
         <div className="absolute bottom-0 border-t border-stone-200 flex justify-end w-full p-3">
