@@ -11,14 +11,14 @@ import Breadcrumb from "../common/Breadcrumb";
 export default function MahasiswaRouter() {
   return (
     <>
-      <div className='flex'>
+      <div className='flex h-screen overflow-hidden'> 
         <Navbar>
-          <NavbarContent text='Dashboard' path='/mahasiswa' icon={<GrHomeRounded size={18} />} />
+          <NavbarContent text='Dashboard' path='/mahasiswa' icon={<GrHomeRounded size={17} />} />
           <NavbarContent text='Classes' path='/mahasiswa/class' icon={<FaRegFolderOpen size={20}/>} />
           <NavbarContent text='Grades' path='/mahasiswa/grade' icon={<IoSchoolOutline size={20}/>} />
         </Navbar>
 
-        <main className='flex-1 relative'>
+        <main className='flex-1 relative overflow-y-auto'>
           <Breadcrumb />
           <Routes>
             <Route index element={<Dashboard />} />

@@ -12,7 +12,7 @@ export function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="flex flex-row gap-2 py-1 px-3 text-sm font-regular text-slate-600 rounded-md hover:underline"
+      className="flex flex-row gap-2 py-1 px-3 text-sm font-regular text-slate-600 rounded-md hover:underline cursor-pointer"
     >
       Log out
       <IoLogInOutline size={20}/>

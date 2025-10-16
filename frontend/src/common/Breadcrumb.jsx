@@ -7,13 +7,13 @@ export default function Breadcrumb() {
   if (pathnames.length === 0) return null;
 
   const role = pathnames[0];
-  const filtered = pathnames.slice(1); // buang prefix role
+  const filtered = pathnames.slice(1);
 
   return (
-    <nav className="sticky mt-5 pl-5 text-sm text-gray-600 top-0 z-20 pb-4">
-      <ul className="flex gap-2">
+    <div className="mt-4 pl-5 mb-5 text-sm text-gray-600 top-0 z-20 pb-4">
+      <ul className="flex px-3 py-1 rounded-4xl gap-2 fixed bg-stone-100 border-1 border-stone-200 shadow-sm hover:bg-zinc-200">
         <li>
-          <Link to={`/${role}`} className="text-blue-500 hover:underline">
+          <Link to={`/${role}`} className="text-blue-500 hover:underline cursor-pointer">
             Home
           </Link>
         </li>
@@ -24,9 +24,9 @@ export default function Breadcrumb() {
 
           return (
             <li key={name} className="flex items-center gap-2">
-              <span>{">"}</span>
+              <span>{"/"}</span>
               {isLast ? (
-                <span className="font-semibold text-gray-800 capitalize">
+                <span className="text-gray-800 capitalize hover:underline cursor-pointer">
                   {name}
                 </span>
               ) : (
@@ -41,6 +41,6 @@ export default function Breadcrumb() {
           );
         })}
       </ul>
-    </nav>
+    </div>
   );
 }
