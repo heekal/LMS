@@ -10,7 +10,7 @@ export default function Breadcrumb() {
   const filtered = pathnames.slice(1); // buang prefix role
 
   return (
-    <nav className="sticky mt-5 pl-5 text-sm text-gray-600 top-0 z-20 pb-4 border-b border-stone-200">
+    <nav className="sticky mt-5 pl-5 text-sm text-gray-600 top-0 z-20 pb-4">
       <ul className="flex gap-2">
         <li>
           <Link to={`/${role}`} className="text-blue-500 hover:underline">

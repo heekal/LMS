@@ -5,9 +5,9 @@ import { LogoutButton } from "../components/buttons/LogoutButton"
 export default function Navbar({ children }) {
   return (
     <>
-      <div className="flex flex-col h-screen w-[265px] relative border-r border-stone-200 bg-[#FDFAF6] "> {/* 265 px */}
+      <div className="flex flex-col h-screen w-[265px] relative border-r border-stone-200 bg-[#F5F5F7] "> {/* 265 px */}
         <div className="flex flex-row border-b border-stone-200 pt-4 pb-3 pl-4">
-          <h1 className="pl-1 pr-1 text-lg">📂</h1>
+          <h1 className="pl-1 pr-1 text-lg  ">📂</h1>
           <h1 className="font-regular text-lg font-bold text-stone-800 pl-2">Your Workspace</h1>
         </div>
         <ul className="pt-3">{children}</ul>
@@ -31,8 +31,8 @@ export function NavbarContent({ text, path, icon }) {
           cursor-pointer py-2 pl-4
           text-sm transition-colors group
           ${isActive
-            ? "bg-[#F1F0E4] font-semibold text-stone-800"
-            : "font-regular text-stone-400 hover:bg-[#F1F0E4] hover:text-stone-700"
+            ? "bg-[#CBCBCB] font-semibold text-stone-800"
+            : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
           }`
         }
       >
