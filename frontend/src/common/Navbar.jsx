@@ -24,13 +24,13 @@ export function NavbarContent({ text, path, icon }) {
     <li className="mx-2 my-1">
       <NavLink
         to={path}
-        end // Prop 'end' penting untuk dashboard agar tidak aktif di path lain
+        end
         className={({ isActive }) => `
           flex flex-row items-center gap-4 rounded-md
           cursor-pointer py-2 pl-4
           text-md transition-colors group
           ${isActive
-            ? "bg-[#6395EE] text-zinc-200"
+            ? "bg-[#6395EE] text-zinc-100 font-regular"
             : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
           }`
         }
