@@ -39,7 +39,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="flex flex-col px-5 mt-5">
-        <h1 className="text-2xl font-semibold text-stone-800 pb-2">My Courses</h1>
+        <h1 className="text-2xl font-semibold text-stone-800">My Courses</h1>
         <div className="h-[200px] items-center overflow-x-auto overflow-y-hidden">
           <MahasiswaCourseCarousel />
         </div>

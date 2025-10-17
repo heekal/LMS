@@ -7,6 +7,7 @@ import Dashboard from '../pages/mahasiswa/MahasiswaDashboard'
 import Courses from '../pages/mahasiswa/MahasiswaCourses'
 import Grades from '../pages/mahasiswa/MahasiswaGrade'
 import Breadcrumb from "../common/Breadcrumb";
+import MahasiswaCourseTemplate from "../components/mahasiswa/MahasiswaCourseTemplate";
 
 export default function MahasiswaRouter() {
   return (
@@ -23,6 +24,7 @@ export default function MahasiswaRouter() {
           <Routes>
             <Route index element={<Dashboard />} />
             <Route path='course' element={<Courses />} />
+            <Route path='course/:id' element={<MahasiswaCourseTemplate />} />
             <Route path='grade' element={<Grades />} />
           </Routes>
         </main>
