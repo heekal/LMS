@@ -4,7 +4,7 @@ import { IoSchoolOutline } from "react-icons/io5";
 import { Routes, Route } from 'react-router-dom'
 import Navbar, { NavbarContent } from "../common/Navbar"
 import Dashboard from '../pages/mahasiswa/MahasiswaDashboard'
-import Courses from '../pages/mahasiswa/MahasiswaCourse'
+import Courses from '../pages/mahasiswa/MahasiswaCourses'
 import Grades from '../pages/mahasiswa/MahasiswaGrade'
 import Breadcrumb from "../common/Breadcrumb";
 

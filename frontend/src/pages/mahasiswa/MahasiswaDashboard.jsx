@@ -11,7 +11,7 @@ export default function Dashboard() {
   return(
     <div className="flex flex-col pb-54 pl-3 pr-5">
       <h1 className="pl-5 pt-4 pb-1 font-semibold text-4xl text-stone-800 cursor-default">{Greetings}, {User}! 👋</h1>
-      <span className="pl-5 mb-5 text-md text-stone-800 cursor-default">Here are the learning activities you're engaged in.</span>
+      <span className="ml-5 mb-5 text-md text-stone-800 cursor-default">Here are the learning activities you're engaged in.</span>
       <div className="flex flex-col px-5 mb-2">
         <h1 className="text-2xl font-semibold text-stone-800 pb-2">My Tasks</h1>
         <div className="rounded-md border border-stone-300 overflow-hidden bg-white">

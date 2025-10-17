@@ -19,7 +19,6 @@ export default function Navbar({ children }) {
 }
 
 export function NavbarContent({ text, path, icon }) {
-
   return (
     <li className="mx-2 my-1">
       <NavLink
