@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom"
 import { LogoutButton } from "../components/buttons/LogoutButton"
+import { useLocation } from "react-router-dom";
+import { GoDotFill } from "react-icons/go";
 
 export default function Navbar({ children }) {
   return (
@@ -42,6 +44,9 @@ export function NavbarContent({ text, path, icon }) {
 }
 
 export function NavbarContentTree({ text, path, icon }){
+  const location = useLocation();
+  const isCourse = location.pathname.includes("/course"); // isinya /mahasiswa/course/id
+
   const courses = [
     "machine-learning", "artificial-intelligence", "big-data", "devsecops", "proposal-tugas-akhir"
   ];
@@ -54,26 +59,40 @@ export function NavbarContentTree({ text, path, icon }){
   return (
     <>
       <li className="mx-2 my-1">
-        <NavLink to={path} end className=" flex flex-row items-center gap-4 rounded-md cursor-pointer py-2 pl-4 text-md transition-colors group bg-[#6395EE] text-zinc-100 font-regular">
+        <NavLink
+          to={path}
+          end={false}
+          className={({ isActive }) => `
+            flex flex-row items-center gap-4 rounded-md
+            cursor-pointer py-2 pl-4
+            text-md transition-colors group
+            ${
+              (isActive || isCourse)
+              ? "bg-[#6395EE] text-zinc-100 font-regular"
+              : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
+            }`
+          }
+        >
           {icon}
           <span>{text}</span>
         </NavLink>
-      </li> 
-      <ul className="mx-2 mx-1">
+      </li>
+      <ul className="px-2">
         {courses.map((course) => (
-          <li key={course}>
+          <li className="flex flex-row items-center" key={course}>
             <NavLink
               to={`${path}/${course}`}
               className={({ isActive }) => `
-                flex flex-row items-center gap-4 rounded-md
-                cursor-pointer py-2 px-3 mb-1 ml-10
-                text-xs transition-colors group 
+                flex flex-row items-center gap-6 rounded-md
+                cursor-pointer py-2 px-5 mb-1
+                text-xs transition-colors group w-full 
                 ${isActive
                   ? "bg-[#CBCBCF] font-regular text-stone-800"
                   : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
                 }`
               }
             >
+              <GoDotFill size={10}/>
               <span>{regex(course)}</span>
             </NavLink>
           </li>
