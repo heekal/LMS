@@ -1,4 +1,4 @@
-export default function Classes() {
+export default function Courses() {
   return (
     <>
       <div className="flex flex-col overflow-x-hidden overflow-y-auto">

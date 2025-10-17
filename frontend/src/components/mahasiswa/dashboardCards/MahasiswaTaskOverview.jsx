@@ -1,4 +1,4 @@
-import { MahasiswaTaskCard } from "../TaskComponents/MahasiswaTaskCard";
+import { MahasiswaTaskCard } from "../taskCards/MahasiswaTaskCard";
 
 export function MahasiswaTaskOverview() {
   return (
