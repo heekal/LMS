@@ -1,6 +1,6 @@
 export function MahasiwaCarouselCard({matakuliah, kelas, kode_dosen}) {
   return(
-    <div className="h-[175px] max-w-[140px] min-w-[140px] flex flex-col border border-1 border-stone-300 rounded-md hover:cursor-pointer hover:shadow-lg transition-shadow">
+    <div className="h-[175px] max-w-[140px] min-w-[140px] flex flex-col border border-1 border-stone-300 rounded-md hover:cursor-pointer hover:shadow-md transition-shadow">
       {/* image container */}
       <div className="h-[60px] w-full bg-zinc-100 rounded-t-md">
 
