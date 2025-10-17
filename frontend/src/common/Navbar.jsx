@@ -4,7 +4,7 @@ import { LogoutButton } from "../components/buttons/LogoutButton"
 export default function Navbar({ children }) {
   return (
     <>
-      <div className="flex flex-col h-screen w-[265px] relative border-r border-stone-200 bg-[#F5F5F7]"> {/* 265 px */}
+      <div className="flex flex-col h-screen w-[265px] relative border-r border-stone-200 bg-[#F5F5F7]">
         <div className="flex flex-row border-b border-stone-200 pt-4 pb-3 pl-4 items-center">
           <h1 className="pl-1 pr-1 text-lg">📂</h1>
           <h1 className="font-regular text-xl font-semibold text-stone-800 pl-2">Your Workspace</h1>
@@ -39,4 +39,46 @@ export function NavbarContent({ text, path, icon }) {
       </NavLink>
     </li>
   );
+}
+
+export function NavbarContentTree({ text, path, icon }){
+  const courses = [
+    "machine-learning", "artificial-intelligence", "big-data", "devsecops", "proposal-tugas-akhir"
+  ];
+
+  const regex = (text) => {
+    if (!text) return '';
+    return text.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  return (
+    <>
+      <li className="mx-2 my-1">
+        <NavLink to={path} end className=" flex flex-row items-center gap-4 rounded-md cursor-pointer py-2 pl-4 text-md transition-colors group bg-[#6395EE] text-zinc-100 font-regular">
+          {icon}
+          <span>{text}</span>
+        </NavLink>
+      </li> 
+      <ul className="mx-2 mx-1">
+        {courses.map((course) => (
+          <li key={course}>
+            <NavLink
+              to={`${path}/${course}`}
+              className={({ isActive }) => `
+                flex flex-row items-center gap-4 rounded-md
+                cursor-pointer py-2 px-3 mb-1 ml-10
+                text-xs transition-colors group 
+                ${isActive
+                  ? "bg-[#CBCBCF] font-regular text-stone-800"
+                  : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
+                }`
+              }
+            >
+              <span>{regex(course)}</span>
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
 }
