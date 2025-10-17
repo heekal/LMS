@@ -11,7 +11,7 @@ export default function Breadcrumb() {
 
   return (
     <div className="mt-4 pl-5 mb-5 text-sm text-gray-600 top-0 z-20 pb-4">
-      <ul className="flex px-3 py-1 rounded-4xl gap-2 fixed bg-stone-100 border-1 border-stone-200 shadow-sm hover:bg-zinc-200">
+      <ul className="flex px-3 py-1 rounded-4xl gap-2 fixed z-10 bg-stone-100 border-1 border-stone-200 shadow-sm hover:bg-zinc-200">
         <li>
           <Link to={`/${role}`} className="text-blue-500 hover:underline cursor-pointer">
             Home
