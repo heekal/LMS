@@ -1,4 +1,4 @@
-import { MahasiswaCourseOverview } from "../../components/mahasiswa/dashboardCards/MahasiswaCourseOverview"
+import { MahasiswaCourseCarousel } from "../../components/mahasiswa/dashboardCards/MahasiswaCourseCarousel"
 import { MahasiswaTaskOverview } from "../../components/mahasiswa/dashboardCards/MahasiswaTaskOverview"
 import { IoIosList } from "react-icons/io";
 import { BiCalendarExclamation } from "react-icons/bi";
@@ -9,7 +9,7 @@ export default function Dashboard() {
   const User = 'Haikal'
 
   return(
-    <div className="flex flex-col pb-6 pl-3 pr-5">
+    <div className="flex flex-col pb-54 pl-3 pr-5">
       <h1 className="pl-5 pt-4 pb-1 font-semibold text-4xl text-stone-800 cursor-default">{Greetings}, {User}! 👋</h1>
       <span className="pl-5 mb-5 text-md text-stone-800 cursor-default">Here are the learning activities you're engaged in.</span>
       <div className="flex flex-col px-5 mb-2">
@@ -40,7 +40,9 @@ export default function Dashboard() {
       </div>
       <div className="flex flex-col px-5 mt-5">
         <h1 className="text-2xl font-semibold text-stone-800 pb-2">My Courses</h1>
-        <MahasiswaCourseOverview />
+        <div className="h-[200px] items-center overflow-x-auto overflow-y-hidden">
+          <MahasiswaCourseCarousel />
+        </div>
       </div>
     </div>
   )
