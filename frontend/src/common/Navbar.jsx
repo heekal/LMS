@@ -46,6 +46,7 @@ export function NavbarContent({ text, path, icon }) {
 export function NavbarContentTree({ text, path, icon }){
   const location = useLocation();
   const isCourse = location.pathname.includes("/course"); // isinya /mahasiswa/course/id
+  const isActive = location.pathname === path;
 
   const courses = [
     "machine-learning", "artificial-intelligence", "big-data", "devsecops", "proposal-tugas-akhir"
@@ -77,27 +78,30 @@ export function NavbarContentTree({ text, path, icon }){
           <span>{text}</span>
         </NavLink>
       </li>
-      <ul className="px-2">
-        {courses.map((course) => (
-          <li className="flex flex-row items-center" key={course}>
-            <NavLink
-              to={`${path}/${course}`}
-              className={({ isActive }) => `
-                flex flex-row items-center gap-6 rounded-md
-                cursor-pointer py-2 px-5 mb-1
-                text-xs transition-colors group w-full 
-                ${isActive
-                  ? "bg-[#CBCBCF] font-regular text-stone-800"
-                  : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
-                }`
-              }
-            >
-              <GoDotFill size={10}/>
-              <span>{regex(course)}</span>
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+      
+      {(isActive || isCourse) && (
+        <ul className="px-2">
+          {courses.map((course) => (
+            <li className="flex flex-row items-center" key={course}>
+              <NavLink
+                to={`${path}/${course}`}
+                className={({ isActive }) => `
+                  flex flex-row items-center gap-6 rounded-md
+                  cursor-pointer py-2 px-5 mb-1
+                  text-xs transition-colors group w-full
+                  ${isActive
+                    ? "bg-[#CBCBCF] font-regular text-stone-800"
+                    : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
+                  }`
+                }
+              >
+                <GoDotFill size={10}/>
+                <span>{regex(course)}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   )
 }

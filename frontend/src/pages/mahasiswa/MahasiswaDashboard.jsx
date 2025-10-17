@@ -5,7 +5,7 @@ import { BiCalendarExclamation } from "react-icons/bi";
 import { FiBookOpen } from "react-icons/fi";
 
 export default function Dashboard() {
-  const Greetings = 'Good Afternoon';
+  const Greetings = 'Good Night';
   const User = 'Haikal'
 
   return(
