@@ -45,11 +45,11 @@ export function NavbarContent({ text, path, icon }) {
 
 export function NavbarContentTree({ text, path, icon }){
   const location = useLocation();
-  const isCourse = location.pathname.includes("/course"); // isinya /mahasiswa/course/id
+  const isCourse = location.pathname.includes("/course");
   const isActive = location.pathname === path;
 
   const courses = [
-    "machine-learning", "artificial-intelligence", "big-data", "devsecops", "proposal-tugas-akhir"
+    "machine-learning", "big-data", "artificial-intelligence"
   ];
 
   const regex = (text) => {

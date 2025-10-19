@@ -32,11 +32,8 @@ export default function Login() {
  
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-stone-100">
-      {/* title */}
       <h1 className="text-[50px] font-semibold text-stone-800 mt-10">Hi, Welcome to University LMS</h1>
       <span className="mt-2 pb-5 text-stone-800 italic">Enter your details to login into your account</span>
-      
-      {/* form */}
       <form onSubmit={handleLogin} className="mb-30 w-[300px] flex flex-col outline pt-3 px-6 rounded-md pb-5 bg-slate-50 outline-stone-500">
         <div className="flex flex-col mt-2 justify-center">
           <label className="pr-3 pb-2 text-sm">SSO Username</label>

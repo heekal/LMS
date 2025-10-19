@@ -10,13 +10,13 @@ export default function MahasiswaCourseTemplate() {
     return text.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
-  const name = regex(id);
+  const title = regex(id);
 
   return (
-    <div>
-      <h1>{name}</h1>
-      <MahasiswaCourseQuiz title={name} courseId={id}/>
-      <MahasiswaCourseSubject title={name} courseId={id}/>
+    <div className="h-full w-full overflow-x-hidden overflow-y-auto flex flex-col pl-8 pt-4">
+      <h1 className="text-stone-800 text-4xl font-semibold mb-1">{title}</h1>
+      <MahasiswaCourseQuiz title={title} courseId={id}/>
+      <MahasiswaCourseSubject title={title} courseId={id}/>
     </div>
   )
 }
