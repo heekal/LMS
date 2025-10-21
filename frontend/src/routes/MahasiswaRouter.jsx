@@ -8,29 +8,35 @@ import Courses from '../pages/mahasiswa/MahasiswaCourses'
 import Grades from '../pages/mahasiswa/MahasiswaGrade'
 import Breadcrumb from "../common/Breadcrumb";
 import MahasiswaCourseTemplate from "../components/mahasiswa/coursesCards/MahasiswaCourseTemplate";
-import MahasiswaQuizTemplate from "../components/mahasiswa/MahasiswaQuizTemplate";
+import MahasiswaQuizLanding from "../components/mahasiswa/quizCards/MahasiswaQuizLanding";
+import MahasiswaQuizStart from "../components/mahasiswa/quizCards/MahasiswaQuizStart";
+import MahasiswaQuizPreview from "../components/mahasiswa/quizCards/MahasiswaQuizPreview";
+
 
 export default function MahasiswaRouter() {
   return (
-    <>
-      <div className='flex h-screen overflow-hidden'> 
-        <Navbar>
-          <NavbarContent text='Dashboard' path='/mahasiswa' icon={<GrHomeRounded size={17} />} />
-          <NavbarContentTree text='Courses' path='/mahasiswa/course' icon={<FaRegFolderOpen size={20}/>} />
-          <NavbarContent text='Grades' path='/mahasiswa/grade' icon={<IoSchoolOutline size={20}/>} />
-        </Navbar>
-
-        <main className='flex-1 relative overflow-y-auto'>
-          <Breadcrumb />
-          <Routes>
-            <Route index element={<Dashboard />} />
-            <Route path='course' element={<Courses />} />
-            <Route path='course/:id' element={<MahasiswaCourseTemplate />} />
-            <Route path='course/:id/:id' element={<MahasiswaQuizTemplate />} />
-            <Route path='grade' element={<Grades />} />
-          </Routes>
-        </main>
-      </div>
-    </>
-  )
+    <div className="flex h-screen overflow-hidden">
+      <Navbar>
+        <NavbarContent text="Dashboard" path="/mahasiswa" icon={<GrHomeRounded size={17} />} />
+        <NavbarContentTree text="Courses" path="/mahasiswa/course" icon={<FaRegFolderOpen size={20} />} />
+        <NavbarContent text="Grades" path="/mahasiswa/grade" icon={<IoSchoolOutline size={20} />} />
+      </Navbar>
+      <main className="flex-1 relative overflow-y-auto">
+        <Breadcrumb />
+        <Routes>
+          <Route index element={<Dashboard />} />
+          <Route path="course">
+            <Route index element={<Courses />} />
+            <Route path=":courseId" element={<MahasiswaCourseTemplate />} />
+            <Route path=":courseId">
+              <Route path=":assignId" element={<MahasiswaQuizLanding />} />
+              <Route path=":assignId/start" element={<MahasiswaQuizStart />} />
+              <Route path=":assignId/preview" element={<MahasiswaQuizPreview />} />
+            </Route>
+          </Route>
+          <Route path="grade" element={<Grades />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }

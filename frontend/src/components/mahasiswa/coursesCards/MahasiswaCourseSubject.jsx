@@ -5,7 +5,7 @@ export default function MahasiswaCourseSubject ({ title, courseId }) {
   return (
     <div className="flex flex-col">
       <div className="mb-2 text-2xl font-semibold text-stone-700">{title} {courseId}</div>
-      <div className="flex flex-col border border-stone-300 rounded-md pt-3 pb-6 px-5 gap-3">
+      <div className="flex flex-col border border-stone-300 shadow-md shadow-stone-200 rounded-md pt-3 pb-6 px-5 gap-3">
         <div className="pb-2 text-stone-600 pt-1">
           <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
           sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
@@ -36,11 +36,12 @@ export default function MahasiswaCourseSubject ({ title, courseId }) {
                 </div>
               </div>
             </div>
-            <div className="flex items-center border border-stone-300 px-3 py-3 rounded-md justify-between cursor-pointer">
-              <div className="flex flex-row text-blue-400 hover:underline">
-                <FiArrowUpLeft size={19}/>
+            <div className="flex items-center border border-stone-300 px-3 py-3 rounded-md justify-between">
+              <div className="flex flex-row text-blue-400 hover:underline cursor-pointer">
+                <FiArrowUpLeft size={20}/>
                 <span>Quiz Link</span>
               </div>
+
               {/* untuk quiz status ada 2 opsi yaitu done dan not done yet */}
               {/* color untuk not done yet bg-rose-200 border-red-400 text-red-900 */}
               {/* color untuk done bg-green-200 border-emerald-400 text-lime-800*/}
