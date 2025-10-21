@@ -17,7 +17,7 @@ export default function MahasiswaRouter() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Navbar>
-        <NavbarContent text="Dashboard" path="/mahasiswa" icon={<GrHomeRounded size={17} />} />
+        <NavbarContent text="Dashboard" path="/mahasiswa" icon={<GrHomeRounded size={20} />} />
         <NavbarContentTree text="Courses" path="/mahasiswa/course" icon={<FaRegFolderOpen size={20} />} />
         <NavbarContent text="Grades" path="/mahasiswa/grade" icon={<IoSchoolOutline size={20} />} />
       </Navbar>
