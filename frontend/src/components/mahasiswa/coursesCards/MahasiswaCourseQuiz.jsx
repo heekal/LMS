@@ -5,7 +5,7 @@ export default function MahasiswaCourseQuiz() {
 
   return (
     <div>
-      Hello From Course Quiz {id}
+      {id}
     </div>
   )
 }
