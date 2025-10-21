@@ -1,19 +1,23 @@
 import MahasiswaCourseSubject from "./MahasiswaCourseSubject";
-import { useParams } from "react-router"
+import { useLocation } from "react-router"
 
 // seluruh materi pada subject akan di render di sini
 // formatnya adalah Judul Subject - File - Quiz
 // oversimplified
 
 export default function MahasiswaCourseTemplate() {
-  const { id } = useParams();
-  
+  const location = useLocation();
+  const pathnames = location.pathname.split("/").filter((x) => x);
+
   const regex = (text) => {
     if (!text) return '';
-    return text.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return text
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
-  const title = regex(id);
+  const title = regex(pathnames[pathnames.length - 1]);
 
   return (
     <div className="flex flex-col pl-8 pt-4 pr-8 pb-40 overflow-x-hidden">
