@@ -1,7 +1,7 @@
-import { FiArrowUpLeft } from "react-icons/fi";
 import { FaRegFile } from "react-icons/fa";
+import MahasiswaCourseQuizNav, { MahasiswaCourseQuizNavContent } from "./MahasiswaCourseQuizPreview";
 
-export default function MahasiswaCourseSubject ({ title, courseId }) {  
+export default function MahasiswaCourseSubject ({ title, courseId, quizName, quizId }) {  
   return (
     <div className="flex flex-col">
       <div className="mb-2 text-2xl font-semibold text-stone-700">{title} {courseId}</div>
@@ -23,30 +23,12 @@ export default function MahasiswaCourseSubject ({ title, courseId }) {
             </div>
           </div>
           <div className="flex flex-col">
-            <div className="flex flex-col gap-1 mb-2 flex-wrap">
+            <div className="flex flex-col gap-1 mb-1">
               <h1 className="text-lg font-semibold">Assignment</h1>
-              <div className="flex flex-col max-w-[170px] py-1 px-2 bg-stone-100 rounded-sm">
-                <div>
-                  <span className="text-sm font-bold text-stone-800">Opened: </span>
-                  <span className="text-sm text-stone-700">20/12/2025</span>
-                </div>
-                <div>
-                  <span className="text-sm font-bold text-stone-800">Due: </span>
-                  <span className="text-sm text-stone-700">22/12/2025</span>
-                </div>
-              </div>
             </div>
-            <div className="flex items-center border border-stone-300 px-3 py-3 rounded-md justify-between">
-              <div className="flex flex-row text-blue-400 hover:underline cursor-pointer">
-                <FiArrowUpLeft size={20}/>
-                <span>Quiz Link</span>
-              </div>
-
-              {/* untuk quiz status ada 2 opsi yaitu done dan not done yet */}
-              {/* color untuk not done yet bg-rose-200 border-red-400 text-red-900 */}
-              {/* color untuk done bg-green-200 border-emerald-400 text-lime-800*/}
-              <span className="px-2 py-1 bg-green-200 rounded-md border border-emerald-400 text-lime-800">Done</span>
-            </div>
+            <MahasiswaCourseQuizNav>
+              <MahasiswaCourseQuizNavContent quizName={quizName} quizId={quizId} status={false}/>
+            </MahasiswaCourseQuizNav>
           </div>
         </div>
       </div>
