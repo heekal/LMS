@@ -1,4 +1,4 @@
-import MahasiswaCoursesList from "../../components/mahasiswa/coursesCards/MahasiswaCoursesList";
+import MahasiswaCoursesList from "../../components/mahasiswa/coursesComponents/MahasiswaCoursesList";
 
 export default function Courses() {
 

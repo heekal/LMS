@@ -7,7 +7,7 @@ import Dashboard from '../pages/mahasiswa/MahasiswaDashboard'
 import Courses from '../pages/mahasiswa/MahasiswaCourses'
 import Grades from '../pages/mahasiswa/MahasiswaGrade'
 import Breadcrumb from "../common/Breadcrumb";
-import MahasiswaCourseTemplate from "../components/mahasiswa/coursesCards/MahasiswaCourseTemplate";
+import MahasiswaCourseTemplate from "../components/mahasiswa/coursesComponents/MahasiswaCourseTemplate";
 import MahasiswaQuizLanding from "../components/mahasiswa/quizCards/MahasiswaQuizLanding";
 import MahasiswaQuizStart from "../components/mahasiswa/quizCards/MahasiswaQuizStart";
 import MahasiswaQuizPreview from "../components/mahasiswa/quizCards/MahasiswaQuizPreview";
