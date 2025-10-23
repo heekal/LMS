@@ -1,7 +1,7 @@
 export default function MahasiswaGradeTable() {
   const data = [
     { class: "Big Data", q1: 90, q2: 85, q3: null, status: false},
-    { class: "Artificial Intelligence", q1: 93, q2: 90, q3: null, status : true },
+    { class: "Artificial Intelligence", q1: 93, q2: 90, q3: 90, status : true },
     { class: "Machine Learning", q1: 70, q2: 57, q3: null, status: false }
   ];
 

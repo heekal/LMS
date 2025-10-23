@@ -3,7 +3,6 @@ import { MahasiswaTaskOverview } from "../../components/mahasiswa/dashboardCompo
 import { IoIosList } from "react-icons/io";
 import { BiCalendarExclamation } from "react-icons/bi";
 import { FiBookOpen } from "react-icons/fi";
-import React from "react";
 
 export default function Dashboard() {
   const Greetings = () => {
@@ -17,10 +16,10 @@ export default function Dashboard() {
     } else {
       return "Night"
     }
-  }
+  };
 
   let greet = Greetings();
-  const User = 'Haikal'
+  const User = 'Haikal';
 
   return(
     <div className="flex flex-col pb-54 pl-3 pr-5">
