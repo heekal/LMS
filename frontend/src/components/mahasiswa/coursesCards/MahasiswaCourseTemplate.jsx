@@ -31,9 +31,9 @@ export default function MahasiswaCourseTemplate() {
       </div>
       
       <div className="flex flex-col gap-10">
-        <MahasiswaCourseSubject title={`Week 1 - Introduction To ${title}`} quizName="Quiz 1" quizId={title}/>
-        <MahasiswaCourseSubject title={`Week 2 - Middle-Term Exam ${title}`} quizName="Quiz 2" quizId={title+"MT"}/>
-        <MahasiswaCourseSubject title={`Week 3 - Final Exam ${title}`} quizName="Quiz 3" quizId={title+"FE"}/>
+        <MahasiswaCourseSubject title={`Week 1 - Introduction To ${title}`} quizName="Quiz 1" quizId={"quiz1"} status={true}/>
+        <MahasiswaCourseSubject title={`Week 2 - Middle-Term Exam ${title}`} quizName="Quiz 2" quizId={"midtermexam"} status={true}/>
+        <MahasiswaCourseSubject title={`Week 3 - Final Exam ${title}`} quizName="Quiz 3" quizId={"finaltermexam"} status={false}/>
       </div>
     </div>
   )

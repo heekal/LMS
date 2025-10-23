@@ -24,8 +24,8 @@ export default function MahasiswaCourseQuizNav({ children }) {
 export function MahasiswaCourseQuizNavContent({ quizName , quizId, status }) {
   return (
     <li className="">
-      <NavLink to={`${status ? "" : quizId}`} end className="flex items-center border border-stone-300 px-3 py-3 rounded-md justify-between">
-        <div className="flex flex-row text-blue-400 hover:underline cursor-pointer">
+      <NavLink to={`${status ? "" : quizId}`} end className={`flex items-center border border-stone-300 px-3 py-3 rounded-md justify-between ${status ? "cursor-default" : "cursor-pointer"}`}>
+        <div className={`flex flex-row ${status ? "text-stone-400" : "hover:underline text-blue-400 "}`}>
           <FiArrowUpLeft size={20} />
           <span>{quizName}</span>
         </div>

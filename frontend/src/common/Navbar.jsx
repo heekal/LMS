@@ -30,16 +30,7 @@ export function NavbarContent({ text, path, icon }) {
       <NavLink
         to={path}
         end
-        className={({ isActive }) => `
-          flex flex-row items-center gap-4 rounded-md
-          cursor-pointer py-2 pl-4
-          text-md transition-colors group
-          ${isActive
-            ? "bg-[#6395EE] text-zinc-100 font-regular"
-            : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"
-          }`
-        }
-      >
+        className={({ isActive }) => `flex flex-row items-center gap-4 rounded-md cursor-pointer py-2 pl-4 text-md transition-colors group ${isActive ? "bg-[#6395EE] text-zinc-100 font-regular" : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"}`}>
         {icon}
         <span>{text}</span>
       </NavLink>
@@ -82,12 +73,12 @@ export function NavbarContentTree({ text, path, icon }){
             onClick={(e) => {e.preventDefault(); e.stopPropagation(); setExpanded((curr) => !curr);}}
             className={`rounded-md group pr-2`}
           >
-            {(isActive || isCourse) && (expanded ? <MdKeyboardArrowUp size={20}/> : <MdKeyboardArrowDown size={20}/> )}
+            {(isActive || isCourse) && (expanded ? <MdKeyboardArrowDown size={20}/> : <MdKeyboardArrowUp size={20}/> )}
           </button>
         </div>      
       </li>
       
-      {!expanded && ((isActive || isCourse) && (
+      {expanded && ((isActive || isCourse) && (
         <ul className="px-2">
           {courses.map((course) => (
             <li className="flex flex-row items-center" key={course}>

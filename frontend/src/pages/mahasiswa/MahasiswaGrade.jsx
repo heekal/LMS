@@ -1,4 +1,4 @@
-const Grades = () => {
+export default function Grades () {
   return (
     <div>
       <div>
@@ -13,5 +13,3 @@ const Grades = () => {
     </div>
   )
 }
-
-export default Grades
