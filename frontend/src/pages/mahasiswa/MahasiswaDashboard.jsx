@@ -1,5 +1,5 @@
-import { MahasiswaCourseCarousel } from "../../components/mahasiswa/dashboardCards/MahasiswaCourseCarousel"
-import { MahasiswaTaskOverview } from "../../components/mahasiswa/dashboardCards/MahasiswaTaskOverview"
+import { MahasiswaCourseCarousel } from "../../components/mahasiswa/dashboardComponents/MahasiswaCourseCarousel"
+import { MahasiswaTaskOverview } from "../../components/mahasiswa/dashboardComponents/MahasiswaTaskOverview"
 import { IoIosList } from "react-icons/io";
 import { BiCalendarExclamation } from "react-icons/bi";
 import { FiBookOpen } from "react-icons/fi";

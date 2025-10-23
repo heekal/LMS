@@ -2,6 +2,7 @@ import { Routes, Route, Navigate} from "react-router-dom"
 import Login from "../pages/auth/Login"
 import DosenRouter from "./DosenRouter"
 import MahasiswaRouter from "./MahasiswaRouter"
+import VerificateRouter from "./VerificateRouter"
 
 function PrivateRoute({ children, role }){
   const user = JSON.parse(localStorage.getItem("user"));
@@ -22,6 +23,9 @@ export default function AppRouter(){
 
       {/* Router Mahasiswa */}
       <Route path="/mahasiswa/*" element={<PrivateRoute role="mahasiswa"><MahasiswaRouter /></PrivateRoute>} />
+
+      {/* Router Verificate */}
+      <Route path="/verify/*" element={<VerificateRouter />} />
     </Routes>
   )
 }

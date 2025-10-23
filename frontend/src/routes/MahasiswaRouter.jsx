@@ -8,9 +8,9 @@ import Courses from '../pages/mahasiswa/MahasiswaCourses'
 import Grades from '../pages/mahasiswa/MahasiswaGrade'
 import Breadcrumb from "../common/Breadcrumb";
 import MahasiswaCourseTemplate from "../components/mahasiswa/coursesComponents/MahasiswaCourseTemplate";
-import MahasiswaQuizLanding from "../components/mahasiswa/quizCards/MahasiswaQuizLanding";
-import MahasiswaQuizStart from "../components/mahasiswa/quizCards/MahasiswaQuizStart";
-import MahasiswaQuizPreview from "../components/mahasiswa/quizCards/MahasiswaQuizPreview";
+import MahasiswaQuizLanding from "../components/mahasiswa/quizComponents/MahasiswaQuizLanding";
+import MahasiswaQuizStart from "../components/mahasiswa/quizComponents/MahasiswaQuizStart";
+import MahasiswaQuizPreview from "../components/mahasiswa/quizComponents/MahasiswaQuizPreview";
 
 
 export default function MahasiswaRouter() {
