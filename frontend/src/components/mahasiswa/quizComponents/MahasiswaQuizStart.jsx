@@ -1,3 +1,5 @@
+import { FaRegDotCircle } from "react-icons/fa";
+
 export default function MahasiswaQuizStart() {
   const quizName = "Machine Learning Quiz 3";
 
@@ -17,16 +19,28 @@ export default function MahasiswaQuizStart() {
       <div className="flex flex-col">
         {data.map(( q, index ) => (
           <div key={q.id} className="flex flex-col border w-[600px] border-stone-400 px-2 py-2 rounded-md mb-4 shadow">
-            <div className="flex flex-row gap-2 mb-1 mt-1">
+            <div className="flex flex-row gap-2 mb-3 mr-1 mt-1">
               <span className="px-3 py-1 text-sm h-fit bg-blue-300 rounded-md">{index + 1}</span>
               <p className="border border-stone-300 rounded-md pl-2 py-2  w-full shadow-sm">{q.question}</p>
             </div>
             <span className="pl-10 text-xs text-stone-600 mb-2 italic">Answer:</span>
-            <div className="pl-10 flex flex-col gap-1">
-              <span>{q.option.a}</span>
-              <span>{q.option.b}</span>
-              <span>{q.option.c}</span>
-              <span>{q.option.d}</span>
+            <div className="pl-10 flex flex-col gap-2 mb-2 mr-1 cursor-pointer">
+              <div className="flex flex-row items-center gap-2 border text-stone-500 hover:bg-green-100 border-stone-300 py-1 px-3 rounded-4xl hover:border-green-400 hover:ring hover:ring-green-400 transition-colors">
+                <FaRegDotCircle />
+                <span>{q.option.a}</span>
+              </div>
+              <div className="flex flex-row items-center gap-2 border text-stone-500 border-stone-300 py-1 px-3 rounded-4xl hover:border-blue-400 hover:ring hover:ring-blue-400 transition-colors">
+                <FaRegDotCircle />
+                <span>{q.option.b}</span>
+              </div>
+              <div className="flex flex-row items-center gap-2 border text-stone-500 border-stone-300 py-1 px-3 rounded-4xl hover:border-blue-400 hover:ring hover:ring-blue-400 transition-colors">
+                <FaRegDotCircle />
+                <span>{q.option.c}</span>
+              </div>
+              <div className="flex flex-row items-center gap-2 border text-stone-500 border-stone-300 py-1 px-3 rounded-4xl hover:border-blue-400 hover:ring hover:ring-blue-400 transition-colors">
+                <FaRegDotCircle />
+                <span>{q.option.d}</span>
+              </div>
             </div>
           </div>
         ))}
