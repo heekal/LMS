@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 export default function MahasiswaQuizLanding() {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    navigate('start');
+    navigate(`start`);
   };
 
   return (
