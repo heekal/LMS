@@ -27,8 +27,8 @@ export default function MahasiswaRouter() {
           <Route index element={<Dashboard />} />
           <Route path="course">
             <Route index element={<Courses />} />
-            <Route path=":courseId" element={<MahasiswaCourseTemplate />} />
             <Route path=":courseId">
+              <Route index element={<MahasiswaCourseTemplate />} />
               <Route path=":assignId" element={<MahasiswaQuizLanding />} />
               <Route path=":assignId/start" element={<MahasiswaQuizStart />} />
               <Route path=":assignId/preview" element={<MahasiswaQuizPreview />} />

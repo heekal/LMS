@@ -1,4 +1,12 @@
+import { useNavigate } from "react-router";
+
 export default function MahasiswaQuizLanding() {
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    navigate('start');
+  };
+
   return (
     <div className="flex flex-col px-8 pt-4">
       <h1 className="font-semibold text-4xl text-stone-800">
@@ -16,7 +24,7 @@ export default function MahasiswaQuizLanding() {
           <li>Do not refresh the page during the quiz.</li>
           <li>Click “Start” only when you're ready.</li>
         </ul>
-        <button className="bg-[#6395EE] text-white font-semibold text-sm px-5 py-2 rounded-lg hover:bg-[#4c7cd8] hover:shadow-md active:scale-[0.98] transition-all duration-150">Start</button>
+        <button onClick={handleStart} className="bg-[#6395EE] text-white font-semibold text-sm px-5 py-2 rounded-lg hover:bg-[#4c7cd8] hover:shadow-md active:scale-[0.98] transition-all duration-150">Start</button>
       </div>
     </div>
   );

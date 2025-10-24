@@ -1,7 +1,7 @@
 export default function MahasiswaQuizStart() {
   return(
     <div>
-      Hello From Template
+      Hello From start
     </div>
   )
 }
