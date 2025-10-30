@@ -19,10 +19,10 @@ export default function AppRouter(){
       <Route path="/login" element={<Login />} />
 
       {/* Router Dosen */}
-      <Route path="/dosen/*" element={<PrivateRoute role="dosen"><DosenRouter /></PrivateRoute>} />
+      <Route path="/dosen/*" element={<DosenRouter />} />
 
       {/* Router Mahasiswa */}
-      <Route path="/mahasiswa/*" element={<PrivateRoute role="mahasiswa"><MahasiswaRouter /></PrivateRoute>} />
+      <Route path="/mahasiswa/*" element={<MahasiswaRouter />} />
 
       {/* Router Verificate */}
       <Route path="/verify/*" element={<VerificateRouter />} />

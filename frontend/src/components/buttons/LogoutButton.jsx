@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { IoLogInOutline } from "react-icons/io5";
+import axios from "../../api/axios";
 
 export function LogoutButton() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("user"); // hapus user
-    navigate("/login");              // redirect ke login
+  const handleLogout = async () => {
+    const res = await axios.post('/api/auth/logout', {}, {withCredentials: true});
+    alert(res.data.message);
+    
+    navigate("/login");
   };
 
   return (
