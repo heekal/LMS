@@ -1,38 +1,27 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import axios from "../../api/axios"
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
   
-    let userData = null;
-    if (username === "dosen" && password === "123") {
-      userData = { username: "dosen", role: "dosen" };
-    } else if (username === "mhs" && password === "123") {
-      userData = { username: "mhs", role: "mahasiswa" };
-    }
-
-    if (userData) {
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      if (userData.role === "dosen"){
-        navigate("/dosen");
-      } else if (userData.role === "mahasiswa"){
-        navigate("/mahasiswa");
-      }
-    } 
-    else {
-      alert("Username atau Password Salah!");
+    try {
+      const response = await axios.post('/api/auth/login', {email, password});
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      navigate(`/${response.data.user.role}`);
+    } catch (error) {
+      const errorMessage = error.response?.data?.error;
+      alert(errorMessage);
     }
   };
  
   const handleVerification = (e) => {
     e.preventDefault;
-
     navigate("/verify");
   };
 
@@ -42,8 +31,8 @@ export default function Login() {
       <span className="mt-2 pb-5 text-stone-800 italic">Enter your details to login into your account</span>
       <form onSubmit={handleLogin} className="w-[300px] flex flex-col outline pt-3 px-6 rounded-md pb-5 bg-slate-50 outline-stone-500">
         <div className="flex flex-col mt-2 justify-center">
-          <label className="pr-3 pb-2 text-sm">SSO Username</label>
-          <input className="italic border-b text-sm border-stone-300 py-1" type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="example@univ.com"/>
+          <label className="pr-3 pb-2 text-sm">SSO Account</label>
+          <input className="italic border-b text-sm border-stone-300 py-1" type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@univ.ac.id"/>
         </div>
         <div className="flex flex-col mt-5 justify-center">
           <label className="pr-3 pb-2 text-sm">Password</label>

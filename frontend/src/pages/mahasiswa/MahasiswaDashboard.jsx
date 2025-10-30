@@ -19,11 +19,12 @@ export default function Dashboard() {
   };
 
   let greet = Greetings();
-  const User = 'Haikal';
+  const fetched = localStorage.getItem("user");
+  const user = fetched ? JSON.parse(fetched) : null;
 
   return(
     <div className="flex flex-col pb-54 pl-3 pr-5">
-      <h1 className="pl-5 pt-4 pb-1 font-semibold text-4xl text-stone-800 cursor-default">Good {greet}, {User}! 👋</h1>
+      <h1 className="pl-5 pt-4 pb-1 font-semibold text-4xl text-stone-800 cursor-default">Good {greet}, {user.name}! 👋</h1>
       <span className="ml-5 mb-5 text-md text-stone-800 cursor-default">Here are the learning activities you're engaged in.</span>
       <div className="flex flex-col px-5 mb-2">
         <h1 className="text-2xl font-semibold text-stone-800 pb-2">My Tasks</h1>
@@ -47,7 +48,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="max-h-[240px] min-h-[48px] overflow-y-auto divide-y divide-stone-200">
-            <MahasiswaTaskOverview />
+            <MahasiswaTaskOverview owner={user.id}/>
           </div>
         </div>
       </div>
