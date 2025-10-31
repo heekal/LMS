@@ -8,7 +8,7 @@ export default function MahasiswaCoursesList() {
   useEffect(() => {
     const fetchCourseList = async() => {
       try {
-        const res = await axios.get('/api/mahasiswa/courses', { withCredentials: true});
+        const res = await axios.get('/api/mahasiswa/course', { withCredentials: true});
         setCourses(res.data.data.courses);
       } catch (error) {
         alert(res.error.Error);

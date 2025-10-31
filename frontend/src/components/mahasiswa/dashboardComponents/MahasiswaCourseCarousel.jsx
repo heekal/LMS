@@ -9,7 +9,7 @@ export function MahasiswaCourseCarousel() {
     const courseFetched = async () => {
       try {
         const res = await axios.get('/api/mahasiswa/dashboard/enrolled', { withCredentials: true });
-        setCourses(res.data.courses); 
+        setCourses(res.data.Data); 
       } catch (error) {
         alert(error.response.data.error);
       }

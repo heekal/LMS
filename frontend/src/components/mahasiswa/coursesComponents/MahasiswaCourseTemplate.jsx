@@ -1,35 +1,44 @@
+import { useEffect, useState } from "react";
 import MahasiswaCourseSubject from "./MahasiswaCourseSubject";
 import { useLocation } from "react-router"
+import axios from "../../../api/axios";
 
 export default function MahasiswaCourseTemplate() {
   const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
+  const [info, setInfo] = useState([]);
 
-  const regex = (text) => {
-    if (!text) return '';
-    return text
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
-  const title = regex(pathnames[pathnames.length - 1]);
+  useEffect(() => {
+    const fetchetSubject = async() => {
+      try {
+        const res = await axios.get(`/api${location.pathname}`, { withCredentials: true});
+        setInfo(res.data.data?.[0]);
+      } catch (error) {
+        alert(res.error.Error);
+      }
+    };
+    fetchetSubject();
+  }, [])
 
   return (
     <div className="flex flex-col pl-8 pt-4 pr-8 pb-40 overflow-x-hidden">
-      <div className="border-b mb-11 pb-3 border-stone-300">
-        <h1 className="text-stone-800 text-4xl font-semibold mb-1">{title}</h1>
-        <span className="mb-3 text-stone-700">Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
-          quissss nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
-          irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
+      <div className="flex flex-col border-b mb-11 pb-3 mb-1 border-stone-300">
+        <h1 className="text-stone-800 text-4xl font-semibold mb-3">{info.courseCode} - {info.courseName}</h1>
+        <span className="text-stone-700">About This Course:</span>
+        <span className="text-stone-700 mb-3">{info.courseDesc}</span>
+        <span className="text-stone-700">Instructor:</span>
+        <span className="text-stone-700 mb-3">{info.InstructorName}</span>
       </div>
       
       <div className="flex flex-col gap-10">
-        <MahasiswaCourseSubject title={`Week 1 - Introduction To ${title}`} quizName="Quiz 1" quizId={"quiz1"} status={true}/>
-        <MahasiswaCourseSubject title={`Week 2 - Middle-Term Exam ${title}`} quizName="Quiz 2" quizId={"midtermexam"} status={true}/>
-        <MahasiswaCourseSubject title={`Week 3 - Final Exam ${title}`} quizName="Quiz 3" quizId={"finaltermexam"} status={false}/>
+        {info?.Data?.map((item, idx) => (
+          <MahasiswaCourseSubject
+            key={idx}
+            title={item.subjectName}
+            quizName={item.quizName}
+            quizId={item.quizUuid}
+            status={true}
+          />
+        ))}
       </div>
     </div>
   )

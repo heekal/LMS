@@ -1,7 +1,10 @@
 import { FaRegFile } from "react-icons/fa";
 import MahasiswaCourseQuizNav, { MahasiswaCourseQuizNavContent } from "./MahasiswaCourseQuizPreview";
 
-export default function MahasiswaCourseSubject ({ title, courseId, quizName, quizId, status }) {  
+
+export default function MahasiswaCourseSubject ({ title, courseId, quizName, quizId, status }) {
+
+
   return (
     <div className="flex flex-col">
       <div className="mb-2 text-2xl font-semibold text-stone-700">{title} {courseId}</div>

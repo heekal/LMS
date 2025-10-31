@@ -23,7 +23,7 @@ export function MahasiswaTaskOverview({ owner }) {
         <div className="flex flex-col overflow-y-auto scrollbar-thin">
           {tasks.map((course) => 
             course.quizzes.map ((quiz) => (
-              <MahasiswaTaskCard key={`${course.course}-${quiz.quizName}`} taskname={ quiz.quizName } deadline={ quiz.closeDate } course={ course.course } courseUuid={ course.uuid } quizUuid={ quiz.quizUuid }/>
+              <MahasiswaTaskCard key={`${course.course}-${quiz.quizName}`} taskname={ quiz.quizName } deadline={ quiz.closeDate } course={ course.courseName } courseUuid={ course.courseUuid } quizUuid={ quiz.quizUuid }/>
             ))
           )}
         </div>
