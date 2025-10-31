@@ -24,9 +24,9 @@ export default function CertificateVerificator() {
       <div className="flex flex-col items-center">
         <h1 className="text-[50px] font-semibold text-stone-800 pb-3">University Diploma Authenticator</h1>
         <span className="text-md text-zinc-700 italic pb-3">please input your credentials below</span>
-        <form onSubmit={handleAuthenticating} className="cursor-pointer flex flex-col flex-grow-y outline rounded-3xl py-1 pl-5 pr-1 bg-slate-50 outline-stone-500">
+        <form onSubmit={handleAuthenticating} className="flex flex-col flex-grow-y outline rounded-3xl py-1 pl-5 pr-1 bg-slate-50 outline-stone-500">
           <div className="flex flex-row">
-            <input className="cursor-pointer font-regular placeholder-blue-300 w-[500px]" placeholder="Diploma Number"/>
+            <input className="cursor-text font-regular placeholder-blue-300 w-[500px]" placeholder="Diploma Number"/>
             <button type="submit" className="cursor-pointer text-stone-700 py-3 px-5 transition-colors hover:bg-indigo-200 rounded-4xl"><FaMagnifyingGlass /></button>
           </div>
         </form>

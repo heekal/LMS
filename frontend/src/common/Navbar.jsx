@@ -2,8 +2,9 @@ import { NavLink } from "react-router-dom"
 import { LogoutButton } from "../components/buttons/LogoutButton"
 import { useLocation } from "react-router-dom";
 import { GoDotFill } from "react-icons/go";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp  } from "react-icons/md";
+import axios from "../api/axios";
 
 export default function Navbar({ children }) {
 return (
@@ -43,16 +44,28 @@ export function NavbarContentTree({ text, path, icon }){
   const isCourse = location.pathname.includes("/course");
   const isActive = location.pathname === path;
   const [expanded, setExpanded] = useState(false);
+  const [courses, setCourses] = useState([]);
 
-  
-  const courses = [
-    "machine-learning", "big-data", "artificial-intelligence"
-  ];
+  useEffect(() => {
+    const courseFetched = async() => {
+      try {
+          const res = await axios.get('/api/mahasiswa/navbar', { withCredentials: true });
+          setCourses(res.data.courses);
+        } catch (error) {
+          alert(error.ersponse.data.error);
+        }
+    };
+    courseFetched();
+  }, []);
 
   const regex = (text) => {
     if (!text) return '';
     return text.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
+
+  const toPath = ( path ) => {
+    return path.toLowerCase().replace(/\s+/g, '-');
+  }
 
   return (
     <>
@@ -81,10 +94,10 @@ export function NavbarContentTree({ text, path, icon }){
       {expanded && ((isActive || isCourse) && (
         <ul className="px-2">
           {courses.map((course) => (
-            <li className="flex flex-row items-center" key={course}>
-              <NavLink to={`${path}/${course}`} className={({ isActive }) => `flex flex-row items-center gap-6 rounded-md cursor-pointer py-2 px-5 mb-1 text-xs transition-colors group w-full ${isActive ? "bg-[#CBCBCF] font-regular text-stone-800" : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"}`}>
+            <li className="flex flex-row items-center" key={`${course.courseName}-${course.courseUuid}`}>
+              <NavLink to={`${path}/${course.courseUuid}/${toPath(course.courseName)}`} className={({ isActive }) => `flex flex-row items-center gap-6 rounded-md cursor-pointer py-2 px-5 mb-1 text-xs transition-colors group w-full ${isActive ? "bg-[#CBCBCF] font-regular text-stone-800" : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"}`}>
                 <GoDotFill size={10}/>
-                <span>{regex(course)}</span>
+                <span>{regex(course.courseName)}</span>
               </NavLink>
             </li>
           ))}

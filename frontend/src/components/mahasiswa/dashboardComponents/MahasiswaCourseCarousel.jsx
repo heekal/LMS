@@ -25,7 +25,7 @@ export function MahasiswaCourseCarousel() {
     <>
       <div className="w-full h-full flex flex-row gap-5 items-center pl-1">
         {courses.map((course) => (
-        <MahasiwaCarouselCard matakuliah={course.courseName} kelas={course.courseCode} kode_dosen={""} path={`${course.courseUuid}/${toPath(course.courseName)}`}/>
+          <MahasiwaCarouselCard key={course.courseUuid} matakuliah={course.courseName} kelas={course.courseCode} kode_dosen={""} path={`${course.courseUuid}/${toPath(course.courseName)}`}/>
         ))}
       </div>
     </>
