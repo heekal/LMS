@@ -91,7 +91,6 @@ func Login(c *gin.Context) {
 	})
 }
 
-// Endpoint buat cek user yang sedang login
 func GetMe(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {

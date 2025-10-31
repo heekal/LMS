@@ -45,7 +45,9 @@ func main() {
 			mahasiswa := protected.Group("/mahasiswa")
 			mahasiswa.Use(middleware.RoleRequired("mahasiswa"))
 			{
-				mahasiswa.GET("/dashboard", mahasiswaController.MahasiswaDashboard)
+				mahasiswa.GET("/dashboard", mahasiswaController.DahsboardGreetings)
+				mahasiswa.GET("/dashboard/enrolled", mahasiswaController.DashboardCourses)
+				mahasiswa.GET("/dashboard/tasks", mahasiswaController.DashboardTaskReminder)
 			}
 
 			{

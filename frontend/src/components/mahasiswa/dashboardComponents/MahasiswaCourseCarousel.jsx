@@ -1,12 +1,32 @@
 import { MahasiwaCarouselCard } from "./MahasiswaCarouselCard"
+import axios from "../../../api/axios"
+import { useEffect, useState } from "react"
 
 export function MahasiswaCourseCarousel() {
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const courseFetched = async () => {
+      try {
+        const res = await axios.get('/api/mahasiswa/dashboard/enrolled', { withCredentials: true });
+        setCourses(res.data.courses); 
+      } catch (error) {
+        alert(error.response.data.error);
+      }
+    };
+    courseFetched();
+  }, []);
+
+  const toPath = ( path ) => {
+    return path.toLowerCase().replace(/\s+/g, '-');
+  }
+
   return (
     <>
       <div className="w-full h-full flex flex-row gap-5 items-center pl-1">
-        <MahasiwaCarouselCard matakuliah={"Machine Learning"} kelas={"TK-46-03"} kode_dosen={"BAH"} path="machine-learning"/>
-        <MahasiwaCarouselCard matakuliah={"Big Data"} kelas={"TK-GAB-04"} kode_dosen={"LIL"} path="big-data"/>
-        <MahasiwaCarouselCard matakuliah={"Artificial Intelligence"} kelas={"TK-GAB-05"} kode_dosen={"PRB"} path="artificial-intelligence"/>
+        {courses.map((course) => (
+        <MahasiwaCarouselCard matakuliah={course.courseName} kelas={course.courseCode} kode_dosen={""} path={`${course.courseUuid}/${toPath(course.courseName)}`}/>
+        ))}
       </div>
     </>
   )

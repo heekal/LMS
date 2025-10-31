@@ -13,13 +13,9 @@ export default function Dashboard() {
     let myDate = new Date();
     let hours = myDate.getHours();
 
-    if (hours < 12) {
-      return "Morning"
-    } else if (hours <= 17) {
-      return "Afternoon"
-    } else {
-      return "Night"
-    }
+    if (hours < 12) { return "Morning" } 
+    else if (hours <= 17) { return "Afternoon" }
+    else { return "Night" }
   };
 
   useEffect(() => {
