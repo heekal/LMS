@@ -1,10 +1,6 @@
 import MahasiswaCourseSubject from "./MahasiswaCourseSubject";
 import { useLocation } from "react-router"
 
-// seluruh materi pada subject akan di render di sini
-// formatnya adalah Judul Subject - File - Quiz
-// oversimplified
-
 export default function MahasiswaCourseTemplate() {
   const location = useLocation();
   const pathnames = location.pathname.split("/").filter((x) => x);

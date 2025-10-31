@@ -1,15 +1,30 @@
+import { useEffect, useState } from "react";
 import MahasiswaCourseOptions, { MahasiswaCourseOptionsContent } from "./MahasiswaCourseOptions"
-import { useLocation } from "react-router-dom"
+import axios from "../../../api/axios";
 
 export default function MahasiswaCoursesList() {
-  const curr = useLocation();
-  const pathnames = curr.pathname;
+  const [courses, setCourses] = useState([]);
 
+  useEffect(() => {
+    const fetchCourseList = async() => {
+      try {
+        const res = await axios.get('/api/mahasiswa/courses', { withCredentials: true});
+        setCourses(res.data.data.courses);
+      } catch (error) {
+        alert(res.error.Error);
+      }
+    };
+    fetchCourseList();
+  }, [])
+
+  const toPath = ( path ) => {
+    return path.toLowerCase().replace(/\s+/g, '-');
+  }
   return (
     <MahasiswaCourseOptions>
-      <MahasiswaCourseOptionsContent course_name="Machine Learning" path={`${pathnames}/machine-learning`} />
-      <MahasiswaCourseOptionsContent course_name="Big Data" path={`${pathnames}/big-data`} />
-      <MahasiswaCourseOptionsContent course_name="Artificial Intelligence" path={`${pathnames}/artificial-intelligence`} />
+      {courses.map((course) => (
+        <MahasiswaCourseOptionsContent key={course.courseUuid} course_name={course.courseName} path={`${course.courseUuid}/${toPath(course.courseName)}`} />  
+      ))}
     </MahasiswaCourseOptions>
   )
 }
