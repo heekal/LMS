@@ -49,8 +49,8 @@ func main() {
 				mahasiswa.GET("/dashboard", mahasiswaController.DahsboardGreetings)
 				mahasiswa.GET("/dashboard/enrolled", mahasiswaController.DashboardCourses)
 				mahasiswa.GET("/dashboard/tasks", mahasiswaController.DashboardTaskReminder)
-				mahasiswa.GET("/courses", mahasiswaController.ShowCourseList)
-				mahasiswa.GET("/courses/:uuid/:courseName", mahasiswaController.ShowCourseDetails)
+				mahasiswa.GET("/course", mahasiswaController.ShowCourseList)
+				mahasiswa.GET("/course/:uuid/:courseName", mahasiswaController.ShowCourseDetails)
 			}
 
 			{

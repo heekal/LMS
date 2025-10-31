@@ -1,8 +1,19 @@
 package models
 
-type QuizzesReminder struct {
+import (
+	"time"
+)
+
+type PerQuizDeadline struct {
 	QuizName  string `json:"quizName"`
 	QuizUuid 	string `json:"quizUuid"`
-	OpenDate  string `json:"openDate" gorm:"column:opened"`
-	CloseDate string `json:"closeDate" gorm:"column:closed"`
+	OpenDate  string `json:"openDate"`
+	CloseDate string `json:"closeDate"`
+}
+
+type PerQuizDeadlineTime struct {
+	QuizName  string `json:"quizName"`
+	QuizUuid 	string `json:"quizUuid"`
+	OpenDate  time.Time `json:"openDate"`
+	CloseDate time.Time `json:"closeDate"`
 }
