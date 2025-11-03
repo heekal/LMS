@@ -2,6 +2,8 @@ package models
 
 import (
 	"backend/db"
+
+	"gorm.io/gorm"
 )
 
 type CourseIdentity struct {
@@ -32,9 +34,9 @@ type GroupTaskPerCourse struct {
 	Quizzes []PerQuizDeadline `json:"quizzes"`
 }
 
-type CourseSubDetails struct {
+type GroupedSubject struct {
 	SubjectData
-	PerQuizDeadline
+	QuizzesInfo  []PerQuizDeadlineStatus `json:"quizzesInfo" gorm:"-"`
 }
 
 type GroupCourseDetails struct {
@@ -42,7 +44,12 @@ type GroupCourseDetails struct {
 	UserAsInstructor
 	CourseCode string `json:"courseCode"`
 	CourseDesc string `json:"courseDesc"`
-	Data []CourseSubDetails `json:"Data" gorm:"-"`
+	SubjectInfo []GroupedSubject `json:"subjectInfo" gorm:"-"`
+}
+
+type CourseSubDetails struct {
+	SubjectData
+	PerQuizDeadlineTime
 }
 
 func GetCoursesList (userId any) (*CourseIdentityList, error) {	
@@ -77,18 +84,12 @@ func GetCourseTaskDeadline (userId any) ([]GroupTaskPerCourse, error) {
 	var list []CourseTaskDeadline
 
 	err := db.DB.Table("enrollments").
-		Select(`
-			courses.name AS course_name,
-			courses.uuid AS course_uuid,
-			quizzes.title AS quiz_name,
-			quizzes.uuid AS quiz_uuid,
-			quizzes.opened_at AS open_date,
-			quizzes.deadline AS close_date
-		`).
+		Select(" courses.name AS course_name, courses.uuid AS course_uuid, quizzes.title AS quiz_name, quizzes.uuid AS quiz_uuid, quizzes.opened_at AS open_date, quizzes.deadline AS close_date").
 		Joins("JOIN courses ON enrollments.course_id = courses.id").
 		Joins("JOIN quizzes ON courses.id = quizzes.course_id").
 		Where("enrollments.student_id = ?", userId).
 		Where("quizzes.opened_at <= NOW()").
+		Where("quizzes.deadline >= NOW()").
 		Scan(&list).Error
 
 	if err != nil {
@@ -118,20 +119,18 @@ func GetCourseTaskDeadline (userId any) ([]GroupTaskPerCourse, error) {
 	return result, nil
 }
 
-func GetCourseDetails(userId any, uuid any) ([]GroupCourseDetails, error) {
-
-	// Ambil course + instructor
+func GetCourseDetails(userId any, uuid any) (*GroupCourseDetails, error) {
 	var course GroupCourseDetails
 
 	err := db.DB.Table("courses c").
 		Select(`
-			c.name AS course_name,
-			c.uuid AS course_uuid,
-			c.description AS course_desc,
-			u.name AS instructor_name,
-			c.code AS course_code
-		`).
+			c.name AS course_name, 
+			c.uuid AS course_uuid, 
+			c.description AS course_desc, 
+			c.code AS course_code, 
+			u.name AS instructor_name`).
 		Joins("JOIN users u ON c.dosen_id = u.id").
+		Joins("JOIN enrollments AS e ON e.course_id = c.id AND e.student_id = ?", userId).
 		Where("c.uuid = ?", uuid).
 		Scan(&course).Error
 
@@ -139,28 +138,85 @@ func GetCourseDetails(userId any, uuid any) ([]GroupCourseDetails, error) {
 		return nil, err
 	}
 
-	// Ambil material + quizzes
-	var data []CourseSubDetails
+	if course.CourseCode == "" {
+		return nil, gorm.ErrRecordNotFound
+	}
 
-	err = db.DB.Table("materials m").
+	var flat []struct {
+		MaterialID  int     `json:"materialId"`
+		SubjectName string  `json:"subjectName"`
+		SubjectDesc string  `json:"subjectDesc"`
+		QuizName    *string `json:"quizName"`
+		QuizUuid    *string `json:"quizUuid"`
+		OpenDate    *string `json:"openDate"`
+		CloseDate   *string `json:"closeDate"`
+		IsActive    *bool   `json:"isActive"`
+		Status      *string `json:"status"`
+	}
+
+	err = db.DB.Table("materials AS m").
 		Select(`
+			m.id AS material_id,
 			m.title AS subject_name,
 			m.description AS subject_desc,
 			q.title AS quiz_name,
 			q.uuid AS quiz_uuid,
-			q.opened_at AS open_date,
-			q.deadline AS close_date
+			TO_CHAR(q.opened_at, 'DD/MM/YY, HH24:MI') AS open_date,
+			TO_CHAR(q.deadline, 'DD/MM/YY, HH24:MI') AS close_date,
+			CASE
+				WHEN q.opened_at <= NOW() AND q.deadline >= NOW() THEN true
+				ELSE false
+			END AS is_active,
+			CASE
+				WHEN q.opened_at > NOW() THEN 'upcoming'
+				WHEN q.opened_at <= NOW() AND q.deadline >= NOW() THEN 'active'
+				WHEN q.deadline < NOW() THEN 'closed'
+				ELSE NULL
+			END AS status
 		`).
-		Joins("LEFT JOIN quizzes q ON q.course_id = m.course_id").
-		Joins("JOIN courses c ON c.id = m.course_id").
+		Joins("JOIN courses AS c ON c.id = m.course_id").
+		Joins("LEFT JOIN quizzes AS q ON q.id = m.id").
 		Where("c.uuid = ?", uuid).
-		Order("m.id, q.opened_at").
-		Scan(&data).Error
+		Order("m.id, q.opened_at NULLS LAST").
+		Scan(&flat).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	course.Data = data
-	return []GroupCourseDetails{course}, nil
+	subjectMap := map[int]*GroupedSubject{}
+	var materialOrder []int
+
+	for _, row := range flat {
+		if _, exists := subjectMap[row.MaterialID]; !exists {
+			subjectMap[row.MaterialID] = &GroupedSubject{
+				SubjectData: SubjectData{
+					SubjectName: row.SubjectName,
+					SubjectDesc: row.SubjectDesc,
+				},
+				QuizzesInfo: []PerQuizDeadlineStatus{},
+			}
+			materialOrder = append(materialOrder, row.MaterialID)
+		}
+
+		if row.QuizUuid != nil && row.Status != nil {
+			subjectMap[row.MaterialID].QuizzesInfo = append(
+				subjectMap[row.MaterialID].QuizzesInfo,
+				PerQuizDeadlineStatus{
+					QuizName:  *row.QuizName,
+					QuizUuid:  *row.QuizUuid,
+					OpenDate:  *row.OpenDate,
+					CloseDate: *row.CloseDate,
+					IsActive:  *row.IsActive,
+					Status:    *row.Status,
+				},
+			)
+		}
+	}
+
+	for _, matID := range materialOrder {
+		course.SubjectInfo = append(course.SubjectInfo, *subjectMap[matID])
+	}
+
+	return &course, nil
 }

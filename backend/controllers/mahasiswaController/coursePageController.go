@@ -26,14 +26,15 @@ func ShowCourseList (c *gin.Context) {
 
 func ShowCourseDetails(c *gin.Context) {
 	courseUuid := c.Param("uuid")
-
 	userId, exist := c.Get("user_id")
+	
 	if !exist {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
 	res, err := models.GetCourseDetails(userId, courseUuid)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

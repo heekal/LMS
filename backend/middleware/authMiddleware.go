@@ -3,7 +3,8 @@ package middleware
 import (
 	"net/http"
 	"os"
-
+	"backend/db"
+	
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -26,7 +27,6 @@ func AuthRequired() gin.HandlerFunc {
 		}
 
 		secret := os.Getenv("JWT_KEY")
-
 		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(secret), nil
 		})
@@ -74,6 +74,59 @@ func RoleRequired(allowedRoles ...string) gin.HandlerFunc {
 		if !allowed {
 			c.JSON(http.StatusForbidden, gin.H{ "error": "Akses ditolak. Anda tidak punya hak akses" })
 			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func IsEnrolled() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, _ := c.Get("user_id")
+		uuid := c.Param("uuid")
+
+		var isEnrolled bool
+		err := db.DB.Raw(`
+			SELECT EXISTS (
+				SELECT 1 FROM enrollments e
+				JOIN courses c ON c.id = e.course_id
+				WHERE e.student_id = ? AND c.uuid = ?
+			)
+		`, userId, uuid).Scan(&isEnrolled).Error
+
+		if err != nil || !isEnrolled {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You are not enrolled in this course"})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func IsStarted() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		quizUuid := c.Param("quizUuid")
+
+		var available bool
+		err := db.DB.Raw(`
+			SELECT EXISTS (
+				SELECT 1
+				FROM quizzes
+				WHERE uuid = ?
+				AND opened_at <= NOW()
+				AND deadline >= NOW()
+			)
+		`, quizUuid).Scan(&available).Error
+
+		if err != nil {
+			c.AbortWithStatusJSON(500, gin.H{"error": "database error"})
+			return
+		}
+
+		if !available {
+			c.AbortWithStatusJSON(403, gin.H{"error": "quiz is not available"})
 			return
 		}
 

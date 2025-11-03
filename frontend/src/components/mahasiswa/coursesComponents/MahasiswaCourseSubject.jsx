@@ -2,17 +2,13 @@ import { FaRegFile } from "react-icons/fa";
 import MahasiswaCourseQuizNav, { MahasiswaCourseQuizNavContent } from "./MahasiswaCourseQuizPreview";
 
 
-export default function MahasiswaCourseSubject ({ title, courseId, quizName, quizId, status }) {
-
-
+export default function MahasiswaCourseSubject ({ title, desc, quizData }) {
   return (
     <div className="flex flex-col">
-      <div className="mb-2 text-2xl font-semibold text-stone-700">{title} {courseId}</div>
+      <div className="mb-2 text-2xl font-semibold text-stone-700">{title}</div>
       <div className="flex flex-col border border-stone-300 shadow-md shadow-stone-200 rounded-md pt-3 pb-6 px-5 gap-3">
         <div className="pb-2 text-stone-600 pt-1">
-          <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
-          quissss nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
+          <span>{desc}</span>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
@@ -30,7 +26,9 @@ export default function MahasiswaCourseSubject ({ title, courseId, quizName, qui
               <h1 className="text-lg font-semibold">Assignment</h1>
             </div>
             <MahasiswaCourseQuizNav>
-              <MahasiswaCourseQuizNavContent quizName={quizName} quizId={quizId} status={status}/>
+              {quizData.map((quiz, idx) => (
+                <MahasiswaCourseQuizNavContent key={idx} quizName={quiz.quizName} quizId={quiz.quizUuid} openDate={quiz.openDate} closeDate={quiz.closeDate} status={quiz.isActive} note={quiz.status}/>
+              ))}
             </MahasiswaCourseQuizNav>
           </div>
         </div>

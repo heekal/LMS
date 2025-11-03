@@ -49,8 +49,19 @@ func main() {
 				mahasiswa.GET("/dashboard", mahasiswaController.DahsboardGreetings)
 				mahasiswa.GET("/dashboard/enrolled", mahasiswaController.DashboardCourses)
 				mahasiswa.GET("/dashboard/tasks", mahasiswaController.DashboardTaskReminder)
-				mahasiswa.GET("/course", mahasiswaController.ShowCourseList)
-				mahasiswa.GET("/course/:uuid/:courseName", mahasiswaController.ShowCourseDetails)
+				mahasiswa.GET("/courses", mahasiswaController.ShowCourseList)
+
+				enrolled := mahasiswa.Group("/course/:uuid")
+				enrolled.Use(middleware.IsEnrolled())
+				{
+					enrolled.GET("/:courseName", mahasiswaController.ShowCourseDetails)
+
+					started := enrolled.Group("/:courseName/:quizUuid")
+					started.Use(middleware.IsStarted())
+					{
+						started.GET("/:quizName", mahasiswaController.HandleQuizLanding)
+					}
+				}
 			}
 
 			{
