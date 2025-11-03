@@ -11,7 +11,7 @@ import MahasiswaCourseTemplate from "../components/mahasiswa/coursesComponents/M
 import MahasiswaQuizLanding from "../components/mahasiswa/quizComponents/MahasiswaQuizLanding";
 import MahasiswaQuizStart from "../components/mahasiswa/quizComponents/MahasiswaQuizStart";
 import MahasiswaQuizPreview from "../components/mahasiswa/quizComponents/MahasiswaQuizPreview";
-
+import NotFoundComponents from "../components/buttons/NotFoundComponents";
 
 export default function MahasiswaRouter() {
   return (
@@ -37,6 +37,7 @@ export default function MahasiswaRouter() {
             </Route>
           </Route>
           <Route path="grade" element={<Grades />} />
+          <Route path="*" element={<NotFoundComponents />} />
         </Routes>
       </main>
     </div>

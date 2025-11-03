@@ -54,12 +54,12 @@ func main() {
 				enrolled := mahasiswa.Group("/course/:uuid")
 				enrolled.Use(middleware.IsEnrolled())
 				{
-					enrolled.GET("/:courseName", mahasiswaController.ShowCourseDetails)
+					enrolled.GET("", mahasiswaController.ShowCourseDetails)
 
-					started := enrolled.Group("/:courseName/:quizUuid")
+					started := enrolled.Group("/:quizUuid")
 					started.Use(middleware.IsStarted())
 					{
-						started.GET("/:quizName", mahasiswaController.HandleQuizLanding)
+						started.GET("", mahasiswaController.HandleQuizLanding)
 					}
 				}
 			}

@@ -4,7 +4,7 @@ import axios from "../../../api/axios";
 
 export default function MahasiswaQuizLanding() {
   const navigate = useNavigate();
-  const location = useLocation();
+  let params = useParams();
   const [error, setError] = useState("")
   const [quiz, setQuiz] = useState([]);
 
@@ -22,7 +22,7 @@ export default function MahasiswaQuizLanding() {
   useEffect(() => {
     const fetchQuizLanding = async() => {
       try {
-        const res = await axios.get(`api${location.pathname}`);
+        const res = await axios.get(`api/mahasiswa/course/${params.courseUuid}/${params.assignmentUuid}`);
         setQuiz(res.data.data[0])
       } catch (error) {
         setError(error);
@@ -34,7 +34,7 @@ export default function MahasiswaQuizLanding() {
   if (error) {
     return(
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-4xl mt-30 text-stone-800 mb-5">{`You Have No Access To This Quiz! ${location.pathname}`}</h1>
+        <h1 className="text-4xl mt-30 text-stone-800 mb-5">You Have No Access To This Quiz!</h1>
         <button onClick={handleBack} className="py-2 px-3 cursor-pointer hover:bg-indigo-300 transition-colors text-sm text-stone-100 bg-indigo-400 rounded-md">Back To My Course</button>
       </div>
     )

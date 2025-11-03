@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import MahasiswaCourseSubject from "./MahasiswaCourseSubject";
-import { useLocation, useNavigate } from "react-router"
+import { useLocation, useNavigate, useParams } from "react-router"
 import axios from "../../../api/axios";
 
 export default function MahasiswaCourseTemplate() {
+  let params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [info, setInfo] = useState([]);
@@ -16,7 +17,7 @@ export default function MahasiswaCourseTemplate() {
   useEffect(() => {
     const fetchetSubject = async() => {
       try {
-        const res = await axios.get(`/api${location.pathname}`, { withCredentials: true});
+        const res = await axios.get(`/api/mahasiswa/course/${params.courseUuid}`, { withCredentials: true});
         setInfo(res.data.data);
       } catch (error) {
         seterrMsg(error.response?.data?.error);
@@ -28,7 +29,7 @@ export default function MahasiswaCourseTemplate() {
   if (errMsg) {
     return (
       <div className="flex flex-col justify-center items-center">
-        <h1 className="text-4xl mt-30 text-stone-800   mb-5">You Have No Access To This Course!</h1>
+        <h1 className="text-4xl mt-30 text-stone-800 mb-5">You Have No Access To This Course!</h1>
         <button onClick={handleBack} className="py-2 px-3 cursor-pointer hover:bg-indigo-300 transition-colors text-sm text-stone-100 bg-indigo-400 rounded-md">Back To My Course</button>
       </div>
     )

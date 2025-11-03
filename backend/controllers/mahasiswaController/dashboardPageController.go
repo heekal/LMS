@@ -35,7 +35,7 @@ func DashboardCourses (c *gin.Context) {
 	})
 }
 
-func DashboardTaskReminder(c *gin.Context) {
+func DashboardTaskReminder (c *gin.Context) {
 	userId, exists := c.Get("user_id")
 	
 	if !exists {
