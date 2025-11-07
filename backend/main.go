@@ -60,6 +60,7 @@ func main() {
 					started.Use(middleware.IsStarted())
 					{
 						started.GET("", mahasiswaController.HandleQuizLanding)
+						started.GET("/start", mahasiswaController.ShowQuizQuestions)
 					}
 				}
 
