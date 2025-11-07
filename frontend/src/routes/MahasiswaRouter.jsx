@@ -12,6 +12,8 @@ import MahasiswaQuizLanding from "../components/mahasiswa/quizComponents/Mahasis
 import MahasiswaQuizStart from "../components/mahasiswa/quizComponents/MahasiswaQuizStart";
 import MahasiswaQuizPreview from "../components/mahasiswa/quizComponents/MahasiswaQuizPreview";
 import NotFoundComponents from "../components/buttons/NotFoundComponents";
+import CourseValidator from "../utils/CourseValidator";
+import AssignmentValidator from "../utils/AssignmentValidator";
 
 export default function MahasiswaRouter() {
   return (
@@ -27,13 +29,14 @@ export default function MahasiswaRouter() {
           <Route index element={<Dashboard />} />
           <Route path="course">
             <Route index element={<Courses />} />
-            <Route path=":courseUuid/:courseName">
+            <Route path=":courseUuid/:courseName" element={<CourseValidator />}>
               <Route index element={<MahasiswaCourseTemplate />} />
-              <Route path=":assignmentUuid/:assigmentName">
+              <Route path=":assignmentUuid/:assignmentName" element={<AssignmentValidator />}>
                 <Route index element={<MahasiswaQuizLanding />} />
                 <Route path="start" element={<MahasiswaQuizStart />} />
                 <Route path="preview" element={<MahasiswaQuizPreview />} />
               </Route>
+              <Route path="*" element={<NotFoundComponents />} />
             </Route>
           </Route>
           <Route path="grade" element={<Grades />} />

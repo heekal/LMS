@@ -28,7 +28,7 @@ export default function MahasiswaGradeTable() {
         <table className="w-full text-sm">
           <thead className="bg-stone-100 text-stone-700">
             <tr>
-              <th className="py-3 px-4 text-left">Course</th>
+              <th className="py-3 px-4 text-left">Course Name</th>
               <th className="py-3 px-4 text-center">Quiz 1</th>
               <th className="py-3 px-4 text-center">Quiz 2</th>
               <th className="py-3 px-4 text-center">Quiz 3</th>
@@ -49,13 +49,6 @@ export default function MahasiswaGradeTable() {
                     )}
                   </td>
                 ))}
-                {/* kalau jumlah quiz kurang dari 3 */}
-                {course.scores.length < 3 &&
-                  Array.from({ length: 3 - course.scores.length }).map((_, i) => (
-                    <td key={`empty-${i}`} className="py-2 px-4 text-center text-gray-400">
-                      Not Finished Yet
-                    </td>
-                  ))}
 
                 <td className="py-2 px-4 text-center">
                   {getStatus(course.scores) ? (
