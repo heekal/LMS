@@ -18,6 +18,12 @@ export default function MahasiswaCourseTemplate() {
     const fetchetSubject = async() => {
       try {
         const res = await axios.get(`/api/mahasiswa/course/${params.courseUuid}`, { withCredentials: true});
+        const correctSlug = res.data.data.courseName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+        if (params.courseName !== correctSlug) {
+          navigate(`/mahasiswa/course/${params.courseUuid}/${correctSlug}`);
+        }
+
         setInfo(res.data.data);
       } catch (error) {
         seterrMsg(error.response?.data?.error);

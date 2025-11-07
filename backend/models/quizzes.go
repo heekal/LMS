@@ -36,6 +36,16 @@ type QuizLandingInfo struct {
 	MaxScore int `json:"maxScore"`
 }
 
+type QuizScore struct {
+    QuizTitle string  `json:"quizTitle"`
+    Score     *int    `json:"score"`
+}
+
+type QuizScorePerSubject struct {
+    CourseName string       `json:"courseName"`
+    Scores     []QuizScore  `json:"scores"`
+}
+
 func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
 	var list []QuizLandingInfo
 
@@ -52,4 +62,49 @@ func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
 	}
 
 	return list, nil
+}
+
+func GetQuizScore (userId any) ([]QuizScorePerSubject, error) {
+	type rawData struct {
+		CourseName string
+		QuizTitle  string
+		Score      *int
+	}
+
+	var rows []rawData
+	query := `
+		SELECT 
+			c.name AS course_name,
+			q.title AS quiz_title,
+			r.score
+		FROM Enrollments e
+		JOIN Courses c ON e.course_id = c.id
+		JOIN Quizzes q ON q.course_id = c.id
+		LEFT JOIN QuizResults r 
+			ON r.quiz_id = q.id AND r.user_id = e.student_id
+		WHERE e.student_id = ?
+		ORDER BY c.name, q.id
+	`
+
+	if err := db.DB.Raw(query, userId).Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+
+	courseMap := make(map[string][]QuizScore)
+	for _, row := range rows {
+		courseMap[row.CourseName] = append(courseMap[row.CourseName], QuizScore{
+			QuizTitle: row.QuizTitle,
+			Score:     row.Score,
+		})
+	}
+
+	var result []QuizScorePerSubject
+	for courseName, scores := range courseMap {
+		result = append(result, QuizScorePerSubject{
+			CourseName: courseName,
+			Scores:     scores,
+		})
+	}
+
+	return result, nil
 }

@@ -62,11 +62,8 @@ func main() {
 						started.GET("", mahasiswaController.HandleQuizLanding)
 					}
 				}
-			}
 
-			{
-				dosen := protected.Group("/dosen")
-				dosen.Use(middleware.RoleRequired("dosen"))
+				mahasiswa.GET("/scores", mahasiswaController.ShowScores)
 			}
 		}
 	}

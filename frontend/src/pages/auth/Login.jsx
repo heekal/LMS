@@ -12,7 +12,6 @@ export default function Login() {
   
     try {
       const response = await axios.post('/api/auth/login', {email, password}, {withCredentials: true});
-      console.log(response.data.user.role)
       navigate(`/${response.data.user.role}`);
     } catch (error) {
       const errorMessage = error.response?.data?.error;

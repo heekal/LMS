@@ -1,9 +1,26 @@
+import { useEffect, useState } from "react";
+import axios from "../../../api/axios";
+
 export default function MahasiswaGradeTable() {
-  const data = [
-    { class: "Big Data", q1: 90, q2: 85, q3: null, status: false},
-    { class: "Artificial Intelligence", q1: 93, q2: 90, q3: 90, status : true },
-    { class: "Machine Learning", q1: 70, q2: 57, q3: null, status: false }
-  ];
+  const [scores, setScores] = useState([]);
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      try {
+        const res = await axios.get("api/mahasiswa/scores", { withCredentials: true });
+        setScores(res.data.Data);
+      } catch (error) {
+        alert(error.response?.data?.error || "Failed to fetch data");
+      }
+    };
+    fetchScores();
+  }, []);
+
+  // fungsi bantu buat menentukan status
+  const getStatus = (scores) => {
+    const finished = scores.every((q) => q.score !== null);
+    return finished;
+  };
 
   return (
     <div className="w-full">
@@ -19,30 +36,46 @@ export default function MahasiswaGradeTable() {
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
+            {scores.map((course) => (
               <tr
-                key={row.class}
+                key={course.courseName}
                 className="border-t border-stone-400 hover:bg-stone-100 transition-colors"
               >
-                <td className="py-3 px-4">{row.class}</td>
+                <td className="py-3 px-4">{course.courseName}</td>
+                {course.scores.map((quiz, i) => (
+                  <td key={i} className="py-2 px-4 text-center">
+                    {quiz.score ?? (
+                      <span className="text-gray-400">Not Finished Yet</span>
+                    )}
+                  </td>
+                ))}
+                {/* kalau jumlah quiz kurang dari 3 */}
+                {course.scores.length < 3 &&
+                  Array.from({ length: 3 - course.scores.length }).map((_, i) => (
+                    <td key={`empty-${i}`} className="py-2 px-4 text-center text-gray-400">
+                      Not Finished Yet
+                    </td>
+                  ))}
+
                 <td className="py-2 px-4 text-center">
-                  {row.q1 ?? <span className="text-gray-400">Not Finished Yet</span>}
-                </td>
-                <td className="py-2 px-4 text-center">
-                  {row.q2 ?? <span className="text-gray-400">Not Finished Yet</span>}
-                </td>
-                <td className="py-2 px-4 text-center">
-                  {row.q3 ?? <span className="text-gray-400">Not Finished Yet</span>}
-                </td>
-                <td className="py-2 px-4 text-center">
-                  {row.status ? <span className="text-green-400 px-3 py-1 bg-emerald-100 rounded-4xl border border-green-200">Passed</span> : <span className="text-rose-400 bg-rose-100 px-3 py-1 rounded-4xl border border-red-200">Not Finished Yet</span>}
+                  {getStatus(course.scores) ? (
+                    <span className="text-green-400 px-3 py-1 bg-emerald-100 rounded-4xl border border-green-200">
+                      Passed
+                    </span>
+                  ) : (
+                    <span className="text-rose-400 bg-rose-100 px-3 py-1 rounded-4xl border border-red-200">
+                      Not Finished Yet
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="text-xs py-3 text-blue-400 italic cursor-default">Please Contact Your Lecturer If Data Wrong</p>
+      <p className="text-xs py-3 text-blue-400 italic cursor-default">
+        Please Contact Your Lecturer If Data Wrong
+      </p>
     </div>
   );
 }

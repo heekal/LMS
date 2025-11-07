@@ -2,60 +2,25 @@ package middleware
 
 import (
 	"net/http"
-	"os"
-	"strings"
 	"backend/db"
-	"backend/utils"
+	"backend/services"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
-
-type Claims struct {
-	UserID int    `json:"user_id"`
-	Email  string `json:"email"`
-	Role   string `json:"role"`
-	Name 	 string `json:"name"`
-	jwt.RegisteredClaims
-}
 
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer "){
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing or invalid Authorization header"})
-			return
-		}
-			
-		encryptedToken := strings.TrimPrefix(authHeader, "Bearer ")
-		tokenString, err := utils.DecryptAES(encryptedToken, os.Getenv("AES_KEY"))
-
+		tokenString, err := c.Cookie("auth_token")
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{ "error": "Token tidak ditemukan" })
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak ditemukan"})
 			c.Abort()
 			return
 		}
 
-		secret := os.Getenv("JWT_KEY")
-		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-			return []byte(secret), nil
-		})
-
-		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{ "error": "Token tidak valid" })
+		claims, err := services.ValidateToken(tokenString)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak valid"})
 			c.Abort()
-			return
-		}
-
-		claims, ok := token.Claims.(*Claims)
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{ "error": "Token tidak valid" })
-			c.Abort()
-			return
-		}
-
-		if claims.Issuer != "backend-api" || !utils.Contains(claims.Audience, "frontend-api") {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token origin"})
 			return
 		}
 
