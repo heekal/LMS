@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Outlet } from "react-router-dom";
 import axios from "../api/axios";
+import NotFoundComponents from "../components/buttons/NotFoundComponents";
 
-export default function ValidatorRoute() {
+export default function CourseValidator() {
   const params = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -26,7 +27,8 @@ export default function ValidatorRoute() {
 
         setLoading(false);
       } catch (err) {
-        navigate("/not-found", { replace: true });
+        setLoading(false);
+        <NotFoundComponents />
       }
     };
 

@@ -36,7 +36,7 @@ export default function MahasiswaRouter() {
                 <Route path="start" element={<MahasiswaQuizStart />} />
                 <Route path="preview" element={<MahasiswaQuizPreview />} />
               </Route>
-              <Route path="*" element={<NotFoundComponents />} />
+              <Route path="*" element={<NotFoundComponents />} /> 
             </Route>
           </Route>
           <Route path="grade" element={<Grades />} />
