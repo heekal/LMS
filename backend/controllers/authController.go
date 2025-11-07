@@ -6,9 +6,11 @@ import (
 	"time"
 	"backend/db"
 	"backend/models"
+	"backend/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type LoginRequest struct {
@@ -19,6 +21,7 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Message string   `json:"message"`
 	User    UserData `json:"user"`
+	Token string `json:"token"`
 }
 
 type UserData struct {
@@ -45,6 +48,9 @@ func generateToken(user models.User) (string, error) {
 		Role:   user.Role,
 		Name:   user.Name,
 		RegisteredClaims: jwt.RegisteredClaims{
+			ID: uuid.NewString(),
+			Issuer: "backend-api",
+			Audience: []string{"frontend-api"},
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(2 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
@@ -58,13 +64,13 @@ func generateToken(user models.User) (string, error) {
 
 func Login(c *gin.Context) {
 	var req LoginRequest
-	var user models.User
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email dan password harus diisi",})
 		return
 	}
 
+	var user models.User
 	result := db.DB.Where("email = ? AND password = ?", req.Email, req.Password).First(&user)
 	
 	if result.Error != nil {
@@ -73,12 +79,14 @@ func Login(c *gin.Context) {
 	}
 
 	token, err := generateToken(user)
+	encryptedToken, _ := utils.EncryptAES(token, os.Getenv("AES_KEY"))
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token",})
 		return
 	}
 
-	c.SetCookie("auth_token", token, 3600*24, "/", "", false, true)
+	c.SetCookie("auth_token", encryptedToken, 3600, "/", "", false, true)
 
 	c.JSON(http.StatusOK, LoginResponse{
 		Message: "Login berhasil",
@@ -88,6 +96,7 @@ func Login(c *gin.Context) {
 			Id:    user.Id,
 			Name:  user.Name,
 		},
+		Token: encryptedToken,
 	})
 }
 
