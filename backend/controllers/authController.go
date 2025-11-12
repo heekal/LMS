@@ -41,7 +41,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := services.GenerateToken(user) // PAKE SERVICE
+	token, err := services.GenerateToken(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token"})
 		return

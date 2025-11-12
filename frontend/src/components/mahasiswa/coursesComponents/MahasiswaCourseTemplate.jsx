@@ -1,29 +1,20 @@
 import { useEffect, useState } from "react";
+import { useLocation,  useSearchParams } from "react-router"
 import MahasiswaCourseSubject from "./MahasiswaCourseSubject";
-import { replace, useLocation, useNavigate, useParams } from "react-router"
 import axios from "../../../api/axios";
 import NotFoundComponents from "../../buttons/NotFoundComponents";
 
 export default function MahasiswaCourseTemplate() {
-  let params = useParams();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
-  const navigate = useNavigate();
   const [info, setInfo] = useState([]);
   const [errMsg, seterrMsg] = useState("");
-
-  const handleBack = () => {
-    navigate('/mahasiswa/course', { replace : true });
-  };
 
   useEffect(() => {
     const fetchetSubject = async() => {
       try {
-        const res = await axios.get(`/api/mahasiswa/course/${params.courseUuid}`, { withCredentials: true});
-        const correctSlug = res.data.data.courseName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-
-        if (params.courseName !== correctSlug) {
-          navigate(`/mahasiswa/course/${params.courseUuid}/${correctSlug}`);
-        }
+        const id = searchParams.get("id") 
+        const res = await axios.get(`/api/mahasiswa/course/${id}`, { withCredentials: true});
 
         setInfo(res.data.data);
       } catch (error) {
@@ -35,7 +26,7 @@ export default function MahasiswaCourseTemplate() {
 
   if (errMsg) {
     return (
-      <NotFoundComponents />
+      <NotFoundComponents msg={errMsg}/>  
     )
   }
 

@@ -1,33 +1,34 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import axios from "../../../api/axios";
 import NotFoundComponents from "../../buttons/NotFoundComponents";
 
 export default function MahasiswaQuizLanding() {
   const navigate = useNavigate();
-  let params = useParams();
-  const [error, setError] = useState("")
+  const[searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [err, setError] = useState("")
   const [quiz, setQuiz] = useState([]);
 
   const handleStart = () => {
-    navigate(`start`);
+    navigate(`/mahasiswa/quiz/start?id=${id}`);
   };
 
   useEffect(() => {
     const fetchQuizLanding = async() => {
       try {
-        const res = await axios.get(`api/mahasiswa/course/${params.courseUuid}/${params.assignmentUuid}`);
+        const res = await axios.get(`api/mahasiswa/quiz/view?id=${id}`);
         setQuiz(res.data.data[0])
       } catch (error) {
-        setError(error);
+        setError(error.response?.data?.error);
       }
     };
     fetchQuizLanding();
   }, [])
 
-  if (error) {
+  if (err) {
     return(
-      <NotFoundComponents />
+      <NotFoundComponents msg={err} />
     )
   }
 

@@ -15,13 +15,10 @@ export default function MahasiswaCourseQuizNav({ children }) {
 
 export function MahasiswaCourseQuizNavContent({ quizName , quizId, openDate, closeDate, status, note }) {
   const navigate = useNavigate();
-
-  const toPath = ( path ) => {
-    return path.toLowerCase().replace(/\s+/g, '-');
-  }
   const handleQuiz = () => {
-    navigate(`${quizId}/${toPath(quizName)}`)
+    navigate(`/mahasiswa/quiz/view?id=${quizId}`)
   }
+
   return (
     <li className="mb-2">
       <div className="flex flex-col py-1 px-2 mb-2 bg-stone-100 rounded-sm">

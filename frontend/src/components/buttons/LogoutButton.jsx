@@ -7,9 +7,8 @@ export function LogoutButton() {
 
   const handleLogout = async () => {
     const res = await axios.post('/api/auth/logout', {}, {withCredentials: true});
-    alert(res.data.message);
-    
     navigate("/login");
+    alert(res.data.message);
   };
 
   return (

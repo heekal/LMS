@@ -13,7 +13,7 @@ export function MahasiswaCourseOptionsContent({ path, course_name }){
   return (
     <li>
       <NavLink 
-        to={path}
+        to={`view?id=${path}`}
         end
         className="
           gap-1 flex w-fit flex-row text-lg font-regular text-stone-500 

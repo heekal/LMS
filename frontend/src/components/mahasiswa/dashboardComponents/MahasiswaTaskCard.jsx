@@ -1,14 +1,10 @@
 import { useNavigate } from "react-router";
 
-export function MahasiswaTaskCard({ taskname, deadline, course, courseUuid, quizUuid }) {
+export function MahasiswaTaskCard({ taskname, deadline, course, quizUuid }) {
   const navigate = useNavigate();
 
-  const toPath = ( path ) => {
-    return path.toLowerCase().replace(/\s+/g, '-');
-  }
-
   const handleNavigate = () => {
-    navigate(`/mahasiswa/course/${courseUuid}/${toPath(course)}/${quizUuid}/${toPath(taskname)}`);
+    navigate(`/mahasiswa/quiz/view?id=${quizUuid}`);
   };
 
   const toCourse = (course) => {

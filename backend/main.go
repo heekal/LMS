@@ -51,17 +51,16 @@ func main() {
 				mahasiswa.GET("/dashboard/tasks", mahasiswaController.DashboardTaskReminder)
 				mahasiswa.GET("/courses", mahasiswaController.ShowCourseList)
 
-				enrolled := mahasiswa.Group("/course/:uuid")
-				enrolled.Use(middleware.IsEnrolled())
+				course := mahasiswa.Group("/course/:uuid")
+				course.Use(middleware.IsEnrolled())
 				{
-					enrolled.GET("", mahasiswaController.ShowCourseDetails)
+					course.GET("", mahasiswaController.ShowCourseDetails)
+				}
 
-					started := enrolled.Group("/:quizUuid")
-					started.Use(middleware.IsStarted())
-					{
-						started.GET("", mahasiswaController.HandleQuizLanding)
-						started.GET("/start", mahasiswaController.ShowQuizQuestions)
-					}
+				quiz := mahasiswa.Group("/quiz")
+				{
+					quiz.GET("/view", middleware.IsStarted(), mahasiswaController.HandleQuizLanding)
+					quiz.GET("/start", middleware.IsStarted(), mahasiswaController.ShowQuizQuestions)
 				}
 
 				mahasiswa.GET("/scores", mahasiswaController.ShowScores)
@@ -71,6 +70,6 @@ func main() {
 
 	port := os.Getenv("APP_PORT")
 
-	log.Printf("🚀 Server running on http://localhost:%s\n", port)
+	log.Printf("Server running on http://localhost:%s\n", port)
 	r.Run(":" + port)
 }

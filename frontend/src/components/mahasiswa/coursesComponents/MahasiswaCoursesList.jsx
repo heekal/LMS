@@ -17,13 +17,10 @@ export default function MahasiswaCoursesList() {
     fetchCourseList();
   }, [])
 
-  const toPath = ( path ) => {
-    return path.toLowerCase().replace(/\s+/g, '-');
-  }
   return (
     <MahasiswaCourseOptions>
       {courses.map((course) => (
-        <MahasiswaCourseOptionsContent key={course.courseUuid} course_name={course.courseName} path={`${course.courseUuid}/${toPath(course.courseName)}`} />  
+        <MahasiswaCourseOptionsContent key={course.courseUuid} course_name={course.courseName} path={`${course.courseUuid}`} />  
       ))}
     </MahasiswaCourseOptions>
   )

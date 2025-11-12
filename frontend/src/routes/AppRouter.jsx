@@ -8,7 +8,7 @@ import NotFoundPage from "../pages/auth/NotFoundPage"
 export default function AppRouter(){
   return(
     <Routes>
-      <Route path="/" element={<Navigate to ="/login" />} />
+      <Route path="/" element={<Navigate to ="/mahasiswa" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/mahasiswa/*" element={<PrivateRoute role="mahasiswa"><MahasiswaRouter /></PrivateRoute>} />
       <Route path="/verify" element={<VerificateRouter />} />

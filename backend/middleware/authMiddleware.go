@@ -6,6 +6,7 @@ import (
 	"backend/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func AuthRequired() gin.HandlerFunc {
@@ -87,7 +88,18 @@ func IsEnrolled() gin.HandlerFunc {
 
 func IsStarted() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		quizUuid := c.Param("quizUuid")
+		userId, _ := c.Get("user_id")
+		quizUuid := c.Query("id")
+
+		if quizUuid == "" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "missing quiz id"})
+			return
+		}
+
+		if _, err := uuid.Parse(quizUuid); err != nil {
+			c.AbortWithStatusJSON(400, gin.H{"error": "invalid quiz id"})
+			return
+		}
 
 		var available bool
 		err := db.DB.Raw(`
@@ -101,12 +113,32 @@ func IsStarted() gin.HandlerFunc {
 		`, quizUuid).Scan(&available).Error
 
 		if err != nil {
-			c.AbortWithStatusJSON(500, gin.H{"error": "database error"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error"})
 			return
 		}
 
 		if !available {
-			c.AbortWithStatusJSON(403, gin.H{"error": "quiz is not available"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "quiz not currently available"})
+			return
+		}
+
+		var enrolled bool
+		err = db.DB.Raw(`
+			SELECT EXISTS (
+				SELECT 1
+				FROM enrollments e
+				INNER JOIN quizzes q ON e.course_id = q.course_id
+				WHERE e.student_id = ?
+				AND q.uuid = ?
+			)
+		`, userId, quizUuid).Scan(&enrolled).Error
+
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+			return
+		}
+		if !enrolled {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "user not enrolled in this course"})
 			return
 		}
 

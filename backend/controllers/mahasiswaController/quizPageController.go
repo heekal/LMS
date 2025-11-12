@@ -9,7 +9,7 @@ import (
 
 func HandleQuizLanding (c *gin.Context) {
 	_, exists := c.Get("user_id")
-	quizUuid := c.Param("quizUuid")
+	quizUuid := c.Query("id")
 
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -28,7 +28,7 @@ func HandleQuizLanding (c *gin.Context) {
 
 func ShowQuizQuestions (c *gin.Context) {
 	_, exists := c.Get("user_id")
-	quizUuid := c.Param("quizUuid")
+	quizUuid := c.Query("id")
 
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})

@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom"
 
-
-export function MahasiwaCarouselCard({matakuliah, kelas, kode_dosen, path}) {
+export function MahasiwaCarouselCard({matakuliah, kelas, path}) {
   const navigate = useNavigate();
   
   const handleMove = () => {
-    navigate(`/mahasiswa/course/${path}`);
+    navigate(`/mahasiswa/course/view?id=${path}`);
   };
   
   return(
@@ -13,7 +12,7 @@ export function MahasiwaCarouselCard({matakuliah, kelas, kode_dosen, path}) {
       <div className="h-[60px] w-full bg-zinc-100 rounded-t-md"></div>
       <span className="flex text-start text-sm font-semibold pl-2 pt-3">{matakuliah}</span>
       <span className="flex text-left text-xs pl-2 pt-1">{kelas}</span>
-      <span className="flex text-xs ml-2 px-2 py-1 mt-2 bg-blue-200 w-fit rounded-md bottom-0">{kode_dosen}</span>
+      <span className="flex text-xs ml-2 px-2 py-1 mt-2 bg-blue-200 w-fit rounded-md bottom-0"></span>
     </button>
   )
 }

@@ -13,19 +13,18 @@ export default function MahasiswaQuizStart() {
   ];
 
   return (
-    <div className="px-8 py-4">
-      <h1 className="text-4xl font-semibold mb-2 text-stone-800">{quizName}</h1>
-      
-      <div className="flex flex-col">
+    <div className="flex flex-col px-8 py-4 justify-evenly items-center">
+      <h1 className="text-4xl font-semibold mb-2 text-stone-700 border-b border-stone-400 pb-3">{quizName}</h1>
+      <div className="flex flex-col pt-2">
         {data.map(( q, index ) => (
-          <div key={q.id} className="flex flex-col border w-[600px] border-stone-400 px-2 py-2 rounded-md mb-4 shadow">
-            <div className="flex flex-row gap-2 mb-3 mr-1 mt-1">
-              <span className="px-3 py-1 text-sm h-fit bg-blue-300 rounded-md">{index + 1}</span>
-              <p className="border-b border-stone-300 pl-2 pb-5  w-full">{q.question}</p>
+          <div key={q.id} className="flex flex-col border w-[600px] border-stone-400 pl-2 pr-3 py-2 rounded-md mb-4 shadow">
+            <div className="flex flex-row mb-3 mr-1 mt-1 pt-1">
+              <span className="px-3 text-md">{index + 1}.</span>
+              <p>{q.question}</p>
             </div>
-            <span className="pl-10 text-xs text-stone-600 mb-2 italic">Answer:</span>
-            <div className="pl-10 flex flex-col gap-2 mb-2 mr-1 cursor-pointer">
-              <div className="flex flex-row items-center gap-2 text-stone-500 border-stone-300 py-1 px-3 rounded-4xltransition-colors">
+            <span className="pl-9 text-xs text-stone-600 mb-2 italic">Answer:</span>
+            <div className="pl-6 flex flex-col mb-2 mr-1 cursor-pointer">
+              <div className="flex flex-row items-center gap-2 text-stone-500 border-stone-300 py-1 px-3 rounded-4xl transition-colors">
                 <FaRegDotCircle />
                 <span>{q.option.a}</span>
               </div>
