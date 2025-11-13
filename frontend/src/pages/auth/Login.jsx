@@ -20,7 +20,7 @@ export default function Login() {
   };
  
   const handleVerification = (e) => {
-    e.preventDefault;
+    e.preventDefault();
     navigate("/verify");
   };
 

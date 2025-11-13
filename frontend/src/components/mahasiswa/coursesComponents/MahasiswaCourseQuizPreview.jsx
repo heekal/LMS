@@ -13,10 +13,10 @@ export default function MahasiswaCourseQuizNav({ children }) {
   )
 }
 
-export function MahasiswaCourseQuizNavContent({ quizName , quizId, openDate, closeDate, status, note }) {
+export function MahasiswaCourseQuizNavContent({ quizName , quizId, openDate, closeDate, status, note, courseId }) {
   const navigate = useNavigate();
   const handleQuiz = () => {
-    navigate(`/mahasiswa/quiz/view?id=${quizId}`)
+    navigate(`/mahasiswa/quiz/view?id=${quizId}&course=${courseId}`)
   }
 
   return (

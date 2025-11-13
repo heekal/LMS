@@ -11,7 +11,7 @@ export default function MahasiswaQuizLanding() {
   const [quiz, setQuiz] = useState([]);
 
   const handleStart = () => {
-    navigate(`/mahasiswa/quiz/start?id=${id}`);
+    navigate(`/mahasiswa/quiz/start?id=${id}&course=${quiz.courseUuid}`);
   };
 
   useEffect(() => {

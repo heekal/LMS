@@ -5,7 +5,7 @@ export default function NotFoundComponents({ msg }) {
       </div>
       <div className="flex flex-col items-center">
         <h1 className="text-[50px] font-semibold text-stone-800 pb-3">404 Page Not Found</h1>
-        <span>{msg}</span>
+        <span>{msg? msg : "Sorry The Page You're accessing is either deleted or not existed yet!"}</span>
       </div>
     </div>
   )

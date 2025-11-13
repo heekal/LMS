@@ -15,12 +15,12 @@ import NotFoundComponents from "../components/buttons/NotFoundComponents";
 export default function MahasiswaRouter() {
   return (
     <div className="flex h-screen overflow-hidden">
-      <Navbar>
+      <Navbar className="flex-0">
         <NavbarContent text="Dashboard" path="/mahasiswa" icon={<GrHomeRounded size={20} />} />
         <NavbarContentTree text="Courses" path="/mahasiswa/course" icon={<FaRegFolderOpen size={20} />} />
         <NavbarContent text="Grades" path="/mahasiswa/grade" icon={<IoSchoolOutline size={20} />} />
       </Navbar>
-      <main className="flex-1 relative overflow-y-auto pt-13">
+      <main className="flex-1 overflow-y-auto pt-13">
         <Routes>
           <Route index element={<Dashboard />} />
           <Route path="course">

@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
-import { useLocation,  useSearchParams } from "react-router"
+import { useSearchParams } from "react-router"
 import MahasiswaCourseSubject from "./MahasiswaCourseSubject";
 import axios from "../../../api/axios";
 import NotFoundComponents from "../../buttons/NotFoundComponents";
 
 export default function MahasiswaCourseTemplate() {
   const [searchParams] = useSearchParams();
-  const location = useLocation();
+  const id = searchParams.get("id") 
   const [info, setInfo] = useState([]);
   const [errMsg, seterrMsg] = useState("");
 
   useEffect(() => {
     const fetchetSubject = async() => {
       try {
-        const id = searchParams.get("id") 
         const res = await axios.get(`/api/mahasiswa/course/${id}`, { withCredentials: true});
 
         setInfo(res.data.data);
@@ -22,7 +21,7 @@ export default function MahasiswaCourseTemplate() {
       }
     };
     fetchetSubject();
-  }, [location.pathname])
+  }, [searchParams])
 
   if (errMsg) {
     return (
@@ -42,7 +41,7 @@ export default function MahasiswaCourseTemplate() {
       
       <div className="flex flex-col gap-10">
         {info?.subjectInfo?.map((item, idx) => (
-          <MahasiswaCourseSubject key={idx} title={item.subjectName} desc={item.subjectDesc} quizData={item.quizzesInfo}/>
+          <MahasiswaCourseSubject key={idx} title={item.subjectName} desc={item.subjectDesc} quizData={item.quizzesInfo} courseId={id}/>
         ))}
       </div>
     </div>

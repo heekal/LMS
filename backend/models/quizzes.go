@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"backend/db"
@@ -35,6 +34,7 @@ type PerQuizDeadlineStatus struct {
 }
 
 type QuizLandingInfo struct {
+	CourseUuid string `json:"courseUuid"`
 	QuizName string `json:"quizName"`
 	QuizDesc string `json:"quizDesc"`
 	MaxScore int    `json:"maxScore"`
@@ -51,9 +51,29 @@ type QuizScorePerSubject struct {
 }
 
 type QuizData struct {
-	ID       string            `json:"id"`
-	Question string            `json:"question"`
-	Option   map[string]string `json:"option"`
+	QuizId     int               `json:"quizId"`
+	QuizName string							 `json:"quizName"`
+	AllQuestion []SingleQuestion `json:"questions"`
+}
+
+type SingleQuestion struct {
+	ID       int                 `json:"id"`
+	Question string              `json:"question"`
+	Option   []OptionsPerQuestion `json:"option"`
+}
+
+type OptionsPerQuestion struct {
+	Label  string `json:"label"`
+	Option string `json:"option"`
+}
+
+type rawQuestionRow struct {
+	QuizID            int    `db:"quiz_id"`
+	ActualQuestionID  int    `db:"actual_question_id"` // ID dari quizquestions
+	Question          string `db:"question"`
+	OptionID          int    `db:"option_id"`          // ID dari questionoptions
+	Option            string `db:"option"`
+	Label             string `db:"label"`
 }
 
 func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
@@ -61,11 +81,13 @@ func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
 
 	err := db.DB.Raw(`
 		SELECT
+			courses.uuid as course_uuid,
 			quizzes.title as quiz_name,
 			quizzes.description as quiz_desc,
 			quizzes.max_score as max_Score
 		FROM quizzes
-		WHERE uuid = ?`, quizUuid).Scan(&list).Error
+		JOIN courses on courses.id = quizzes.course_id
+		WHERE quizzes.uuid = ?`, quizUuid).Scan(&list).Error
 
 	if err != nil {
 		return nil, err
@@ -119,79 +141,69 @@ func GetQuizScore (userId any) ([]QuizScorePerSubject, error) {
 	return result, nil
 }
 
-func GetQuizQuestions(quizUuid any) ([]QuizData, error) {
-	// 1️⃣ Ambil quiz_id dari quizzes.uuid
-	var quizID int
-	if err := db.DB.Raw("SELECT id FROM quizzes WHERE uuid = ?", quizUuid).Scan(&quizID).Error; err != nil {
-		return nil, fmt.Errorf("gagal ambil quiz_id: %v", err)
+func GetQuizQuestions(quizUuid any) (*QuizData, error) {
+	// Bikin struct temporary buat scan
+	var quizInfo struct {
+		ID    int    `gorm:"column:id"`
+		Title string `gorm:"column:title"`
 	}
-	if quizID == 0 {
+	
+	err := db.DB.Raw("SELECT id, title FROM quizzes WHERE uuid = ?", quizUuid).
+		Scan(&quizInfo).Error
+	
+	if err != nil {
+		return nil, fmt.Errorf("gagal ambil quiz: %v", err)
+	}
+	if quizInfo.ID == 0 {
 		return nil, errors.New("quiz tidak ditemukan")
 	}
 
-	// 2️⃣ Ambil semua pertanyaan
-	type Question struct {
-		ID           int
-		QuestionText string
-	}
-	var questions []Question
-	if err := db.DB.Raw(`
-		SELECT id, question_text
-		FROM quizquestions
-		WHERE quiz_id = ?
-		ORDER BY question_order ASC
-	`, quizID).Scan(&questions).Error; err != nil {
-		return nil, fmt.Errorf("gagal ambil pertanyaan: %v", err)
-	}
-
-	if len(questions) == 0 {
-		return []QuizData{}, nil
-	}
-
-	// 3️⃣ Ambil semua opsi berdasarkan daftar question_id
-	var questionIDs []int
-	for _, q := range questions {
-		questionIDs = append(questionIDs, q.ID)
-	}
-
-	fmt.Println("Question IDs:", questionIDs)
-
-	type Option struct {
-		QuestionID  int
-		OptionLabel string
-		OptionText  string
-	}
-	var options []Option
-	if err := db.DB.Raw(`
-		SELECT question_id, option_label, option_text
+	var rows []rawQuestionRow
+	err = db.DB.Raw(`
+		SELECT 
+			quizquestions.quiz_id AS quiz_id,
+			quizzes.title AS quiz_name,
+			quizquestions.id AS actual_question_id,
+			quizquestions.question_text AS question,
+			questionoptions.id AS option_id,
+			questionoptions.option_text AS option,
+			questionoptions.option_label AS label
 		FROM questionoptions
-		WHERE question_id IN ?
-	`, questionIDs).Scan(&options).Error; err != nil {
-		return nil, fmt.Errorf("gagal ambil opsi: %v", err)
+		JOIN quizquestions ON questionoptions.question_id = quizquestions.id
+		JOIN quizzes ON quizzes.id = quizquestions.quiz_id
+		WHERE quizzes.uuid = ?
+		ORDER BY quizquestions.question_order`, quizUuid).Scan(&rows).Error
+
+	if err != nil {
+		return nil, fmt.Errorf("gagal ambil data quiz: %v", err)
 	}
 
-	// 4️⃣ Kelompokkan opsi berdasarkan question_id
-	optionMap := make(map[int]map[string]string)
-	for _, opt := range options {
-		if optionMap[opt.QuestionID] == nil {
-			optionMap[opt.QuestionID] = make(map[string]string)
+	questionMap := make(map[int]*SingleQuestion)
+	for _, r := range rows {
+		q, exists := questionMap[r.ActualQuestionID]
+		if !exists {
+			q = &SingleQuestion{
+				ID:       r.ActualQuestionID,
+				Question: r.Question,
+				Option:   []OptionsPerQuestion{},
+			}
+			questionMap[r.ActualQuestionID] = q
 		}
-		optionMap[opt.QuestionID][opt.OptionLabel] = opt.OptionText
-	}
-
-	// 5️⃣ Susun hasil akhir
-	var result []QuizData
-	for _, q := range questions {
-		opts := optionMap[q.ID]
-		if opts == nil {
-			opts = map[string]string{}
-		}
-		result = append(result, QuizData{
-			ID:       strconv.Itoa(q.ID),
-			Question: q.QuestionText,
-			Option:   opts,
+		q.Option = append(q.Option, OptionsPerQuestion{
+			Label:  r.Label,
+			Option: r.Option,
 		})
 	}
 
+	var allQuestions []SingleQuestion
+	for _, q := range questionMap {
+		allQuestions = append(allQuestions, *q)
+	}
+
+	result := &QuizData{
+		QuizId:      quizInfo.ID,
+		QuizName:    quizInfo.Title,
+		AllQuestion: allQuestions,
+	}
 	return result, nil
 }

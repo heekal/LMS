@@ -2,7 +2,7 @@ import { FaRegFile } from "react-icons/fa";
 import MahasiswaCourseQuizNav, { MahasiswaCourseQuizNavContent } from "./MahasiswaCourseQuizPreview";
 
 
-export default function MahasiswaCourseSubject ({ title, desc, quizData }) {
+export default function MahasiswaCourseSubject ({ title, desc, quizData, courseId }) {
   return (
     <div className="flex flex-col">
       <div className="mb-2 text-2xl font-semibold text-stone-700">{title}</div>
@@ -27,7 +27,7 @@ export default function MahasiswaCourseSubject ({ title, desc, quizData }) {
             </div>
             <MahasiswaCourseQuizNav>
               {quizData.map((quiz, idx) => (
-                <MahasiswaCourseQuizNavContent key={idx} quizName={quiz.quizName} quizId={quiz.quizUuid} openDate={quiz.openDate} closeDate={quiz.closeDate} status={quiz.isActive} note={quiz.status}/>
+                <MahasiswaCourseQuizNavContent key={idx} quizName={quiz.quizName} quizId={quiz.quizUuid} openDate={quiz.openDate} closeDate={quiz.closeDate} status={quiz.isActive} note={quiz.status} courseId={courseId}/>
               ))}
             </MahasiswaCourseQuizNav>
           </div>

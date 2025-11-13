@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router";
 
-export function MahasiswaTaskCard({ taskname, deadline, course, quizUuid }) {
+export function MahasiswaTaskCard({ taskname, deadline, course, courseUuid, quizUuid }) {
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    navigate(`/mahasiswa/quiz/view?id=${quizUuid}`);
+    navigate(`/mahasiswa/quiz/view?id=${quizUuid}&course=${courseUuid}`);
   };
 
   const toCourse = (course) => {
