@@ -61,6 +61,7 @@ func main() {
 				{
 					quiz.GET("/view", middleware.IsStarted(), mahasiswaController.HandleQuizLanding)
 					quiz.GET("/start", middleware.IsStarted(), mahasiswaController.ShowQuizQuestions)
+					quiz.POST("/post", middleware.IsStarted(), mahasiswaController.HandleQuizSubmitPayload)
 				}
 
 				mahasiswa.GET("/scores", mahasiswaController.ShowScores)

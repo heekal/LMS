@@ -35,6 +35,7 @@ export default function MahasiswaQuizLanding() {
   return (
     <div className="flex flex-col px-8 pt-4">
       <h1 className="font-semibold text-4xl text-stone-800 mb-5">{quiz.quizName}</h1>
+      <p className="text-stone-800">About this assignment: </p>
       <p className="mt-1 text-stone-700 pb-1">{quiz.quizDesc}</p>
       <div className="flex flex-row gap-1 mb-4 pb-3 border-b border-stone-300">
         <p className="text-stone-700">Max Score:</p>
@@ -47,7 +48,7 @@ export default function MahasiswaQuizLanding() {
           <li>Changing link during quiz will result in failure, your score will automatically be 0</li>
           <li>Click “Start” only when you're ready.</li>
         </ul>
-        <button onClick={handleStart} className="bg-[#6395EE] text-white font-semibold text-sm px-5 py-2 rounded-lg hover:bg-[#4c7cd8] hover:shadow-md active:scale-[0.98] transition-all duration-150">Start</button>
+        <button onClick={handleStart} className="bg-[#6395EE] cursor-pointer text-white font-semibold text-sm px-5 py-2 rounded-lg hover:bg-[#4c7cd8] hover:shadow-md active:scale-[0.98] transition-all duration-150">Start</button>
       </div>
     </div>
   );

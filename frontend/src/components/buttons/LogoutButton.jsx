@@ -30,15 +30,15 @@ export function LogoutButton() {
       </button>
 
       {showModal && (
-        <div className="fixed bottom-10 right-10 z-50 animate-slide-left">
-          <div className="rounded-md shadow-sm relative border border-stone-400 hover:shadow-lg">
-            <button onClick={() => setShowModal(false)} className="cursor-pointer absolute -top-3 -right-2 bg-stone-200 hover:bg-stone-300 text-white rounded-full p-1 border border-stone-700" disabled={isLoading}>
+        <div className="fixed bottom-10 right-10 z-50">
+          <div className="rounded-md backdrop-blur-sm shadow-sm relative border border-stone-400 hover:shadow-lg">
+            <button onClick={() => setShowModal(false)} className="cursor-pointer absolute -top-3 -right-2 bg-stone-200 hover:bg-stone-300 text-white rounded-full p-1 border border-stone-500" disabled={isLoading}>
               <IoCloseOutline size={15} color="black"/>
             </button>
 
             <div className="flex flex-col items-center">
               <h3 className="pt-2 px-5 mt-1 text-md text-stone-700 cursor-default">
-                Make sure all of your jobs are 
+                Make sure your works are saved or 
               </h3>
               <h3 className="pb-2 px-5 mb-2 text-md text-stone-700 cursor-default">
                 finished before logging out 🧐
@@ -49,7 +49,7 @@ export function LogoutButton() {
                 {isLoading ? "Logging out..." : "Logout"}
               </button>
               <button onClick={() => setShowModal(false)} className="p-2 rounded-md text-xs text-slate-500 hover:text-slate-700 cursor-pointer border-stone-300 hover:border-stone-500 border" disabled={isLoading}>
-                Batal
+                Cancel
               </button>
               </div>
             </div>

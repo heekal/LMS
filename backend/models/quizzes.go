@@ -76,6 +76,16 @@ type rawQuestionRow struct {
 	Label             string `db:"label"`
 }
 
+type QuizAnswer struct {
+    QuestionID int    `json:"questionId"`
+    Option     string `json:"option"`
+}
+
+type QuizSubmitPayload struct {
+    QuizID int          `json:"quizId"`
+    Answer []QuizAnswer `json:"answer"`
+}
+
 func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
 	var list []QuizLandingInfo
 
@@ -142,7 +152,6 @@ func GetQuizScore (userId any) ([]QuizScorePerSubject, error) {
 }
 
 func GetQuizQuestions(quizUuid any) (*QuizData, error) {
-	// Bikin struct temporary buat scan
 	var quizInfo struct {
 		ID    int    `gorm:"column:id"`
 		Title string `gorm:"column:title"`
