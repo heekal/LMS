@@ -47,7 +47,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("auth_token", token, 3600, "/", "", false, true)
+	c.SetCookie("auth_token", token, 7200, "/", "", false, true)
 
 	c.JSON(http.StatusOK, LoginResponse{
 		Message: "Login berhasil",

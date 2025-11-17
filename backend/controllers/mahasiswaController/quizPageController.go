@@ -78,5 +78,5 @@ func HandleQuizSubmitPayload (c *gin.Context) {
 		return
 	}
 	
-	c.JSON(200, gin.H{"message": 202})
+	c.JSON(200, gin.H{"message": "Submitted"})
 }

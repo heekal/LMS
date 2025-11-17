@@ -6,6 +6,7 @@ import (
 	"backend/controllers"
 	"backend/db"
 	"backend/middleware"
+	"backend/services"
 	"backend/controllers/mahasiswaController"
 
 	"github.com/gin-contrib/cors"
@@ -20,6 +21,8 @@ func main() {
 
 	db.Connect()
 
+	services.StartScheduler()
+	
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
