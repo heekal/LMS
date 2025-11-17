@@ -8,14 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 func HandleQuizLanding (c *gin.Context) {
 	_, exists := c.Get("user_id")
-	quizUuid := c.Query("id")
 
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+
+	quizUuid := c.Query("id")
 
 	result, err := models.GetQuizLanding(quizUuid)
 
@@ -46,20 +48,35 @@ func ShowQuizQuestions (c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": result })
 }
 
-func HandleQuizSubmitPayload(c *gin.Context) {
-	_, exists := c.Get("user_id")
+func HandleQuizSubmitPayload (c *gin.Context) {
+	userId, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
 	var payload models.QuizSubmitPayload
+	
+	// check if format payload sesuai dgn yg dikirim
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	fmt.Printf("Received payload: %+v\n", payload)
+	// check apakah quizId yg dikirim valid
+	var isValid bool
+	isValid, err := models.CheckQuizId(userId, payload.QuizID)
 
-	c.JSON(200, gin.H{"message": "Payload received"})
+	if err != nil {
+		fmt.Printf(err.Error())
+		c.JSON(404, gin.H{"error" : err.Error()})
+		return
+	}
+
+	if !isValid {
+		c.JSON(404, gin.H{"error" : "Unauthorized"})
+		return
+	}
+	
+	c.JSON(200, gin.H{"message": 202})
 }

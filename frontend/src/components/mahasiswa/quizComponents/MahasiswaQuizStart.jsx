@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { FaRegDotCircle, FaRegCircle } from "react-icons/fa";
 import axios from "../../../api/axios";
 import { useNavigate, useSearchParams } from "react-router";
@@ -10,6 +10,8 @@ export default function MahasiswaQuizStart() {
   const [answer, setAnswer] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState("");
+  const [showSubmitError, setShowSubmitError] = useState(false);
+  const [ErrorSubmitMessage, setErrorSubmitMessage] = useState("");
   const navigate = useNavigate();
   const id = searchParams.get("id");
 
@@ -35,6 +37,13 @@ export default function MahasiswaQuizStart() {
     }
   }));
 
+  const triggerModal = () => {
+    setShowSubmitError(true);
+    setTimeout(() => {
+      setShowSubmitError(false);
+    }, 5000)
+  };
+
   const handleSelect = (questionId, optionLabel) => {
     setAnswer(prev => ({
       ...prev,
@@ -55,7 +64,8 @@ export default function MahasiswaQuizStart() {
       const res = await axios.post(`/api/mahasiswa/quiz/post?id=${id}`, payload);
       setSubmitted(res.data.message);
     } catch (error) {
-      console.error("submit error:", error);
+      setErrorSubmitMessage(error.response.data.error);
+      triggerModal();
     }
   }
 
@@ -152,6 +162,14 @@ export default function MahasiswaQuizStart() {
             <div className="py-1 px-3 cursor-pointer text-sm text-slate-600 border border-slate-500 hover:text-slate-800 bg-green-300 rounded-lg hover:bg-green-400 hover:shadow-sm" onClick={handleSubmit}>
               Submit
             </div>
+          </div>
+        </div>
+      )}
+
+      {showSubmitError && (
+        <div className="fixed bottom-5 right-10 z-50 flex flex-col px-3 py-1 border bg-rose-300/50 border-red-400 rounded-sm backdrop-blur-lg">
+          <div className="text-sm text-red-700/70">
+            <div>{ErrorSubmitMessage}</div>
           </div>
         </div>
       )}

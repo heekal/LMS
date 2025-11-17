@@ -59,9 +59,9 @@ func main() {
 
 				quiz := mahasiswa.Group("/quiz")
 				{
-					quiz.GET("/view", middleware.IsStarted(), mahasiswaController.HandleQuizLanding)
-					quiz.GET("/start", middleware.IsStarted(), mahasiswaController.ShowQuizQuestions)
-					quiz.POST("/post", middleware.IsStarted(), mahasiswaController.HandleQuizSubmitPayload)
+					quiz.GET("/view", middleware.IsAllowed(), mahasiswaController.HandleQuizLanding)
+					quiz.GET("/start", middleware.IsAllowed(), mahasiswaController.ShowQuizQuestions)
+					quiz.POST("/post", middleware.IsAllowed(), middleware.CanSubmitQuiz(), mahasiswaController.HandleQuizSubmitPayload)
 				}
 
 				mahasiswa.GET("/scores", mahasiswaController.ShowScores)

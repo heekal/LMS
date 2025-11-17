@@ -151,7 +151,7 @@ func GetQuizScore (userId any) ([]QuizScorePerSubject, error) {
 	return result, nil
 }
 
-func GetQuizQuestions(quizUuid any) (*QuizData, error) {
+func GetQuizQuestions (quizUuid any) (*QuizData, error) {
 	var quizInfo struct {
 		ID    int    `gorm:"column:id"`
 		Title string `gorm:"column:title"`
@@ -215,4 +215,23 @@ func GetQuizQuestions(quizUuid any) (*QuizData, error) {
 		AllQuestion: allQuestions,
 	}
 	return result, nil
+}
+
+func CheckQuizId (userId any, quizId any) (bool, error) {
+	var isValid bool
+
+	err := db.DB.Raw(`
+		SELECT EXISTS (
+			SELECT 1
+			FROM quizzes
+			JOIN enrollments ON enrollments.course_id = quizzes.course_id
+			WHERE enrollments.student_id = ?
+			AND quizzes.id = ?
+		)`, userId, quizId).Scan(&isValid).Error
+
+	if err != nil {
+		return false, fmt.Errorf("gagal ambil data quiz: %v", err)
+	}
+
+	return isValid, err
 }

@@ -86,7 +86,7 @@ func IsEnrolled() gin.HandlerFunc {
 	}
 }
 
-func IsStarted() gin.HandlerFunc {
+func IsAllowed() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId, _ := c.Get("user_id")
 		quizUuid := c.Query("id")
@@ -101,8 +101,31 @@ func IsStarted() gin.HandlerFunc {
 			return
 		}
 
-		var available bool
+		// check if user ngambil course 
+		var enrolled bool
 		err := db.DB.Raw(`
+			SELECT EXISTS (
+				SELECT 1
+				FROM enrollments e
+				INNER JOIN quizzes q ON e.course_id = q.course_id
+				WHERE e.student_id = ?
+				AND q.uuid = ?
+			)
+		`, userId, quizUuid).Scan(&enrolled).Error
+
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+			return
+		}
+		
+		if !enrolled {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "user not enrolled in this course"})
+			return
+		}
+
+		// check if course dibuka
+		var available bool
+		err = db.DB.Raw(`
 			SELECT EXISTS (
 				SELECT 1
 				FROM quizzes
@@ -118,27 +141,44 @@ func IsStarted() gin.HandlerFunc {
 		}
 
 		if !available {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "quiz not currently available"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "quiz not available"})
 			return
 		}
 
-		var enrolled bool
-		err = db.DB.Raw(`
+		c.Next()
+	}
+}
+
+func CanSubmitQuiz() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userId, exists := c.Get("user_id")
+		
+		if !exists {
+			c.JSON(http.StatusForbidden, gin.H{ "error": "User Tidak Ditemukan" })
+			c.Abort()
+			return
+		}
+
+		quizUuid := c.Query("id")
+
+		// check if user udah submit sebelumnya atau belum
+		var canSubmit bool
+		err := db.DB.Raw(`
 			SELECT EXISTS (
 				SELECT 1
-				FROM enrollments e
-				INNER JOIN quizzes q ON e.course_id = q.course_id
-				WHERE e.student_id = ?
-				AND q.uuid = ?
-			)
-		`, userId, quizUuid).Scan(&enrolled).Error
+				FROM quizresults
+				JOIN quizzes on quizresults.quiz_id = quizzes.id
+				WHERE quizresults.user_id = ?
+				AND quizzes.uuid = ?
+			)`, userId, quizUuid).Scan(&canSubmit).Error
 
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error"})
 			return
 		}
-		if !enrolled {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "user not enrolled in this course"})
+
+		if canSubmit {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "user has already finished the assigment"})
 			return
 		}
 
