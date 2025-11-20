@@ -6,7 +6,7 @@ export default function MahasiswaCourseSubject ({ title, desc, quizData, courseI
   return (
     <div className="flex flex-col">
       <div className="mb-2 text-2xl font-semibold text-stone-700">{title}</div>
-      <div className="flex flex-col border border-stone-300 shadow-md shadow-stone-200 rounded-md pt-3 pb-6 px-5 gap-3">
+      <div className="flex flex-col border border-stone-300 shadow-md shadow-stone-200 rounded-md pt-3 pb-6 px-5 gap-3 hover:shadow-md ">
         <div className="pb-2 text-stone-600 pt-1">
           <span>{desc}</span>
         </div>
@@ -27,7 +27,7 @@ export default function MahasiswaCourseSubject ({ title, desc, quizData, courseI
             </div>
             <MahasiswaCourseQuizNav>
               {quizData.map((quiz, idx) => (
-                <MahasiswaCourseQuizNavContent key={idx} quizName={quiz.quizName} quizId={quiz.quizUuid} openDate={quiz.openDate} closeDate={quiz.closeDate} status={quiz.isActive} note={quiz.status} courseId={courseId}/>
+                <MahasiswaCourseQuizNavContent key={idx} quizName={quiz.quizName} quizId={quiz.quizUuid} note={quiz.status} openDate={quiz.openDate} closeDate={quiz.closeDate} status={quiz.isActive} isCompleted={quiz.isCompleted} courseId={courseId}/>
               ))}
             </MahasiswaCourseQuizNav>
           </div>

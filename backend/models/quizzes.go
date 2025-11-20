@@ -31,6 +31,7 @@ type PerQuizDeadlineStatus struct {
 	CloseDate string `json:"closeDate"`
 	IsActive  bool   `json:"isActive"`
 	Status    string `json:"status"`
+	IsCompleted bool `json:"isCompleted"`
 }
 
 type QuizLandingInfo struct {
@@ -77,13 +78,13 @@ type rawQuestionRow struct {
 }
 
 type QuizAnswer struct {
-    QuestionID int    `json:"questionId"`
-    Option     string `json:"option"`
+	QuestionID int    `json:"questionId"`
+	Option     string `json:"option"`
 }
 
 type QuizSubmitPayload struct {
-    QuizID int          `json:"quizId"`
-    Answer []QuizAnswer `json:"answer"`
+	QuizID int          `json:"quizId"`
+	Answers []QuizAnswer `json:"answer"`
 }
 
 func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
@@ -227,6 +228,8 @@ func CheckQuizId (userId any, quizId any) (bool, error) {
 			JOIN enrollments ON enrollments.course_id = quizzes.course_id
 			WHERE enrollments.student_id = ?
 			AND quizzes.id = ?
+			AND quizzes.opened_at <= NOW()
+			AND quizzes.deadline >= NOW()
 		)`, userId, quizId).Scan(&isValid).Error
 
 	if err != nil {
@@ -234,4 +237,64 @@ func CheckQuizId (userId any, quizId any) (bool, error) {
 	}
 
 	return isValid, err
+}
+
+func HandleQuizGrading(userId any, quizId any, answers []QuizAnswer) error {
+	// Ambil max_score
+	var maxScore int
+	err := db.DB.Raw(`
+		SELECT max_score
+		FROM quizzes
+		WHERE id = ?
+	`, quizId).Scan(&maxScore).Error
+	if err != nil {
+			return err
+	}
+
+	// Ambil kunci jawaban
+	type CorrectAnswer struct {
+		QuestionId    int
+		CorrectOption string
+	}
+	var correctList []CorrectAnswer
+
+	err = db.DB.Raw(`
+		SELECT qq.id AS question_id, qo.option_label AS correct_option
+		FROM quizquestions qq
+		JOIN questionoptions qo ON qo.question_id = qq.id
+		WHERE qq.quiz_id = ? AND qo.is_correct = TRUE
+	`, quizId).Scan(&correctList).Error
+	if err != nil {
+		return err
+	}
+
+	correctMap := make(map[int]string)
+	for _, item := range correctList {
+		correctMap[item.QuestionId] = item.CorrectOption
+	}
+
+	// Hitung jumlah benar
+	correct := 0
+	for _, ans := range answers {
+		if correctMap[ans.QuestionID] == ans.Option {
+			correct++
+		}
+	}
+
+	total := len(correctMap)
+
+	// Hitung skor final berdasarkan max_score
+	finalScore := int(float64(correct) / float64(total) * float64(maxScore))
+
+	// Simpan hasil (double submit ditangani oleh UNIQUE constraint)
+	err = db.DB.Exec(`
+		INSERT INTO quizresults (user_id, quiz_id, score, is_submitted)
+		VALUES (?, ?, ?, true)
+	`, userId, quizId, finalScore).Error
+
+	if err != nil {
+		return fmt.Errorf("Database Error")
+	}
+
+	return nil
 }

@@ -78,5 +78,12 @@ func HandleQuizSubmitPayload (c *gin.Context) {
 		return
 	}
 	
+	// lakukan penilaian
+	err = models.HandleQuizGrading(userId, payload.QuizID, payload.Answers)
+
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(200, gin.H{"message": "Submitted"})
 }

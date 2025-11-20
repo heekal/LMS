@@ -1,5 +1,5 @@
-import { FiArrowUpLeft } from "react-icons/fi"
-import { NavLink, useNavigate } from "react-router"
+import { FiArrowUpLeft, FiCheck } from "react-icons/fi"
+import { useNavigate } from "react-router"
 
 export default function MahasiswaCourseQuizNav({ children }) {
   return (
@@ -11,11 +11,58 @@ export default function MahasiswaCourseQuizNav({ children }) {
   )
 }
 
-export function MahasiswaCourseQuizNavContent({ quizName , quizId, openDate, closeDate, status, note, courseId }) {
+export function MahasiswaCourseQuizNavContent({ 
+  quizName, 
+  quizId, 
+  openDate, 
+  closeDate, 
+  status, 
+  note, 
+  isCompleted, 
+  courseId 
+}) {
+  const isDisabled = !status || isCompleted;
+  const isActive = status && !isCompleted;
   const navigate = useNavigate();
+  
   const handleQuiz = () => {
-    navigate(`/mahasiswa/quiz/view?id=${quizId}&course=${courseId}`)
+    if (!isDisabled) {
+      navigate(`/mahasiswa/quiz/view?id=${quizId}&course=${courseId}`)
+    }
   }
+
+  // Get button styling based on state
+  const getButtonClass = () => {
+    if (isCompleted) {
+      return "cursor-not-allowed bg-stone-50";
+    }
+    if (isActive) {
+      return "cursor-pointer hover:bg-stone-50";
+    }
+    return "cursor-not-allowed";
+  };
+
+  // Get text styling based on state
+  const getTextClass = () => {
+    if (isCompleted) {
+      return "text-stone-500";
+    }
+    if (isActive) {
+      return "hover:underline text-blue-400";
+    }
+    return "text-stone-400";
+  };
+
+  // Get badge styling based on state
+  const getBadgeClass = () => {
+    if (isCompleted) {
+      return "bg-blue-200 border-blue-400 text-blue-800";
+    }
+    if (status) {
+      return "bg-green-200 border-emerald-400 text-lime-800";
+    }
+    return "bg-rose-200 border-red-400 text-red-900";
+  };
 
   return (
     <li className="mb-2">
@@ -29,15 +76,22 @@ export function MahasiswaCourseQuizNavContent({ quizName , quizId, openDate, clo
           <span className="text-sm text-stone-700">{closeDate}</span>
         </div>
       </div>
-      <button onClick={handleQuiz} disabled={!status} className={`flex w-full items-center border border-stone-300 px-3 py-3 rounded-md justify-between ${status ? "cursor-pointer" : "cursor-not-allowed"}`}>
-        <div className={`flex flex-row ${status ?  "hover:underline text-blue-400 " : "text-stone-400"}`}>
-          <FiArrowUpLeft size={20} />
+      <button 
+        onClick={handleQuiz} 
+        disabled={isDisabled} 
+        className={`flex w-full items-center border border-stone-300 px-3 py-3 rounded-md justify-between ${getButtonClass()}`}
+      >
+        <div className={`flex flex-row items-center gap-1 ${getTextClass()}`}>
+          {isCompleted ? (
+            <FiArrowUpLeft size={20} />
+          ) : (
+            <FiArrowUpLeft size={20} />
+          )}
           <span>{quizName}</span>
         </div>
-        <span className={`px-2 py-1 rounded-md border 
-          ${status 
-            ? "bg-green-200 border-emerald-400 text-lime-800"
-            : "bg-rose-200 border-red-400 text-red-900"}`}>{note}</span>
+        <span className={`px-2 py-1 rounded-md border ${getBadgeClass()}`}>
+          {isCompleted ? "Completed" : note}
+        </span>
       </button>
     </li>
   )

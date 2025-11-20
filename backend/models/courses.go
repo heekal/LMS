@@ -36,14 +36,14 @@ type GroupTaskPerCourse struct {
 
 type GroupedSubject struct {
 	SubjectData
-	QuizzesInfo  []PerQuizDeadlineStatus `json:"quizzesInfo" gorm:"-"`
+	QuizzesInfo []PerQuizDeadlineStatus `json:"quizzesInfo" gorm:"-"`
 }
 
 type GroupCourseDetails struct {
 	CourseIdentityCode
 	UserAsInstructor
-	CourseCode string `json:"courseCode"`
-	CourseDesc string `json:"courseDesc"`
+	CourseCode  string           `json:"courseCode"`
+	CourseDesc  string           `json:"courseDesc"`
 	SubjectInfo []GroupedSubject `json:"subjectInfo" gorm:"-"`
 }
 
@@ -52,35 +52,43 @@ type CourseSubDetails struct {
 	PerQuizDeadlineTime
 }
 
-func GetCoursesList (userId any) (*CourseIdentityList, error) {	
+func GetCoursesList(userId any) (*CourseIdentityList, error) {
 	var list []CourseIdentity
 
-	err := db.DB.Table("enrollments").Select("courses.name AS course_name, courses.uuid AS course_uuid").Joins("JOIN courses ON enrollments.course_id = courses.id").Where("enrollments.student_id = ?", userId).Scan(&list).Error
-	
+	err := db.DB.Table("enrollments").
+		Select("courses.name AS course_name, courses.uuid AS course_uuid").
+		Joins("JOIN courses ON enrollments.course_id = courses.id").
+		Where("enrollments.student_id = ?", userId).
+		Scan(&list).Error
+
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
 
-	result := &CourseIdentityList {
+	result := &CourseIdentityList{
 		Courses: list,
 	}
 
 	return result, nil
 }
 
-func GetCourseIdentityCode (userId any) ([]CourseIdentityCode, error) {
+func GetCourseIdentityCode(userId any) ([]CourseIdentityCode, error) {
 	var list []CourseIdentityCode
 
-	err := db.DB.Table("courses").Select("courses.name AS course_name	, courses.code AS course_code, courses.uuid AS course_uuid").Joins("JOIN enrollments ON enrollments.course_id = courses.id").Where("enrollments.student_id = ?", userId).Scan(&list).Error
-	
+	err := db.DB.Table("courses").
+		Select("courses.name AS course_name, courses.code AS course_code, courses.uuid AS course_uuid").
+		Joins("JOIN enrollments ON enrollments.course_id = courses.id").
+		Where("enrollments.student_id = ?", userId).
+		Scan(&list).Error
+
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
 
 	return list, nil
 }
 
-func GetCourseTaskDeadline (userId any) ([]GroupTaskPerCourse, error) {
+func GetCourseTaskDeadline(userId any) ([]GroupTaskPerCourse, error) {
 	var list []CourseTaskDeadline
 
 	err := db.DB.Raw(`
@@ -106,7 +114,7 @@ func GetCourseTaskDeadline (userId any) ([]GroupTaskPerCourse, error) {
 		)`, userId, userId).Scan(&list).Error
 
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
 
 	courseMap := make(map[string]GroupTaskPerCourse)
@@ -165,6 +173,7 @@ func GetCourseDetails(userId any, uuid any) (*GroupCourseDetails, error) {
 		CloseDate   *string `json:"closeDate"`
 		IsActive    *bool   `json:"isActive"`
 		Status      *string `json:"status"`
+		IsCompleted *bool   `json:"isCompleted"` // Added field
 	}
 
 	err = db.DB.Table("materials AS m").
@@ -185,10 +194,15 @@ func GetCourseDetails(userId any, uuid any) (*GroupCourseDetails, error) {
 				WHEN q.opened_at <= NOW() AND q.deadline >= NOW() THEN 'active'
 				WHEN q.deadline < NOW() THEN 'closed'
 				ELSE NULL
-			END AS status
+			END AS status,
+			CASE
+				WHEN qr.id IS NOT NULL AND is_submitted = true THEN true
+				ELSE false
+			END AS is_completed
 		`).
 		Joins("JOIN courses AS c ON c.id = m.course_id").
-		Joins("LEFT JOIN quizzes AS q ON q.id = m.id").
+		Joins("LEFT JOIN quizzes AS q ON q.material_id = m.id").
+		Joins("LEFT JOIN quizresults AS qr ON qr.quiz_id = q.id AND qr.user_id = ?", userId).
 		Where("c.uuid = ?", uuid).
 		Order("m.id, q.opened_at NULLS LAST").
 		Scan(&flat).Error
@@ -213,15 +227,21 @@ func GetCourseDetails(userId any, uuid any) (*GroupCourseDetails, error) {
 		}
 
 		if row.QuizUuid != nil && row.Status != nil {
+			isCompleted := false
+			if row.IsCompleted != nil {
+				isCompleted = *row.IsCompleted
+			}
+
 			subjectMap[row.MaterialID].QuizzesInfo = append(
 				subjectMap[row.MaterialID].QuizzesInfo,
 				PerQuizDeadlineStatus{
-					QuizName:  *row.QuizName,
-					QuizUuid:  *row.QuizUuid,
-					OpenDate:  *row.OpenDate,
-					CloseDate: *row.CloseDate,
-					IsActive:  *row.IsActive,
-					Status:    *row.Status,
+					QuizName:    *row.QuizName,
+					QuizUuid:    *row.QuizUuid,
+					OpenDate:    *row.OpenDate,
+					CloseDate:   *row.CloseDate,
+					IsActive:    *row.IsActive,
+					Status:      *row.Status,
+					IsCompleted: isCompleted, // Added field
 				},
 			)
 		}
