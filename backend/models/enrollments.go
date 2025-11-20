@@ -14,7 +14,7 @@ type EnrolledCourseIdentityList struct {
 	Courses []EnrolledCourseIdentity `json:"courses"`
 }
 
-func GetEnrolledCoursesList(userId any) ([]EnrolledCourseIdentity, error) {
+func GetEnrolledCoursesList (userId any) ([]EnrolledCourseIdentity, error) {
 	var enrolled []EnrolledCourseIdentity
 
 	err := db.DB.Table("enrollments").

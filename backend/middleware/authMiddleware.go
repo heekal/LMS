@@ -164,13 +164,13 @@ func CanSubmitQuiz() gin.HandlerFunc {
 		// check if user udah submit sebelumnya atau belum
 		var canSubmit bool
 		err := db.DB.Raw(`
-			SELECT EXISTS (
-				SELECT 1
-				FROM quizresults
-				JOIN quizzes on quizresults.quiz_id = quizzes.id
-				WHERE quizresults.user_id = ?
-				AND quizzes.uuid = ?
-			)`, userId, quizUuid).Scan(&canSubmit).Error
+		SELECT EXISTS (
+			SELECT 1
+			FROM quizresults
+			JOIN quizzes on quizresults.quiz_id = quizzes.id
+			WHERE quizresults.user_id = ?
+			AND quizzes.uuid = ?
+		)`, userId, quizUuid).Scan(&canSubmit).Error
 
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error"})
