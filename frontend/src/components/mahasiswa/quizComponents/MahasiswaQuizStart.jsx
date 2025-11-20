@@ -1,7 +1,8 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaRegDotCircle, FaRegCircle } from "react-icons/fa";
 import axios from "../../../api/axios";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
+import MahasiswaQuizSubmitted from "./MahasiswaQuizSubmitted";
 
 export default function MahasiswaQuizStart() {
   const [searchParams] = useSearchParams();
@@ -12,7 +13,6 @@ export default function MahasiswaQuizStart() {
   const [submitted, setSubmitted] = useState("");
   const [showSubmitError, setShowSubmitError] = useState(false);
   const [ErrorSubmitMessage, setErrorSubmitMessage] = useState("");
-  const navigate = useNavigate();
   const id = searchParams.get("id");
 
   useEffect(() => {
@@ -68,15 +68,6 @@ export default function MahasiswaQuizStart() {
       triggerModal();
     }
   }
-
-  const handleToGrade=()=>{
-    navigate('/mahasiswa/grade');
-  }
-
-  const handleToThisCourse=()=>{
-    const course = searchParams.get("course")
-    navigate(`/mahasiswa/course/view?id=${course}`)
-  }
   
   if (err) {
     return <div className="text-red-500 text-center mt-8">{err}</div>;
@@ -84,18 +75,7 @@ export default function MahasiswaQuizStart() {
 
   if (submitted) {
     return (
-      <div className="flex flex-col px-8 py-4">
-        <h1 className="text-4xl font-semibold text-stone-800 mb-3">{quizzes.quizName} has successfully been submitted!</h1>
-        <span className="text-stone-800">Our system will be automatically grading your submission.</span>
-        <div className="flex flex-row">
-          <span className="text-stone-800">Please kindly wait until your grade is showing on your</span>
-          <button className="ml-1 text-blue-500 underline cursor-pointer" onClick={handleToGrade}>grades page.</button>
-        </div>
-        <div className="flex flex-row">
-          <span className="text-stone-800" >In the meantime, you may want to check your another</span>
-          <button className="text-blue-500 underline cursor-pointer ml-1" onClick={handleToThisCourse}>assignment.</button>
-        </div>
-      </div>
+     <MahasiswaQuizSubmitted quizName={quizzes.quizName} /> 
     )
   }
 

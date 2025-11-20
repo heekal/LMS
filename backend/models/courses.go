@@ -83,14 +83,27 @@ func GetCourseIdentityCode (userId any) ([]CourseIdentityCode, error) {
 func GetCourseTaskDeadline (userId any) ([]GroupTaskPerCourse, error) {
 	var list []CourseTaskDeadline
 
-	err := db.DB.Table("enrollments").
-		Select(" courses.name AS course_name, courses.uuid AS course_uuid, quizzes.title AS quiz_name, quizzes.uuid AS quiz_uuid, quizzes.opened_at AS open_date, quizzes.deadline AS close_date").
-		Joins("JOIN courses ON enrollments.course_id = courses.id").
-		Joins("JOIN quizzes ON courses.id = quizzes.course_id").
-		Where("enrollments.student_id = ?", userId).
-		Where("quizzes.opened_at <= NOW()").
-		Where("quizzes.deadline >= NOW()").
-		Scan(&list).Error
+	err := db.DB.Raw(`
+		SELECT
+			courses.name AS course_name, 
+			courses.uuid AS course_uuid, 
+			quizzes.title AS quiz_name, 
+			quizzes.uuid AS quiz_uuid, 
+			quizzes.id AS quiz_id,
+			quizzes.opened_at AS open_date, 
+			quizzes.deadline AS close_date
+		FROM enrollments
+		JOIN courses ON enrollments.course_id = courses.id
+		JOIN quizzes ON courses.id = quizzes.course_id
+		WHERE enrollments.student_id = ? 
+		AND quizzes.opened_at <= NOW() 
+		AND quizzes.deadline >= NOW()
+		AND NOT EXISTS (
+			SELECT 1
+			FROM quizresults
+			WHERE quizresults.quiz_id = quizzes.id
+			AND quizresults.user_id = ?
+		)`, userId, userId).Scan(&list).Error
 
 	if err != nil {
 		return nil, err 

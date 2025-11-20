@@ -1,6 +1,6 @@
-import { GrHomeRounded } from "react-icons/gr";
-import { FaRegFolderOpen } from "react-icons/fa";
-import { IoSchoolOutline } from "react-icons/io5";
+import { TbSmartHome } from "react-icons/tb";
+import { LuFolderOpen } from "react-icons/lu";
+import { PiGraduationCapBold } from "react-icons/pi";
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar, { NavbarContent, NavbarContentTree } from "../common/Navbar"
 import Dashboard from '../pages/mahasiswa/MahasiswaDashboard'
@@ -15,9 +15,9 @@ export default function MahasiswaRouter() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Navbar className="flex-0">
-        <NavbarContent text="Dashboard" path="/mahasiswa" icon={<GrHomeRounded size={20} />} />
-        <NavbarContentTree text="Courses" path="/mahasiswa/course" icon={<FaRegFolderOpen size={20} />} />
-        <NavbarContent text="Grades" path="/mahasiswa/grade" icon={<IoSchoolOutline size={20} />} />
+        <NavbarContent text="Dashboard" path="/mahasiswa" icon={<TbSmartHome size={20} />} />
+        <NavbarContentTree text="Courses" path="/mahasiswa/course" icon={<LuFolderOpen  size={20} />} />
+        <NavbarContent text="Grades" path="/mahasiswa/grade" icon={<PiGraduationCapBold size={20} />} />
       </Navbar>
       <main className="flex-1 overflow-y-auto pt-13">
         <Routes>

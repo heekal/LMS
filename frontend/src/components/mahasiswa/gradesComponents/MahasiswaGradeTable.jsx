@@ -39,7 +39,7 @@ export default function MahasiswaGradeTable() {
             {scores.map((course) => (
               <tr
                 key={course.courseName}
-                className="border-t border-stone-400 hover:bg-stone-100 transition-colors"
+                className="border-t border-stone-400 hover:bg-stone-100 transition-colors cursor-pointer"
               >
                 <td className="py-3 px-4">{course.courseName}</td>
                 {course.scores.map((quiz, i) => (

@@ -13,7 +13,6 @@ export function LogoutButton() {
     try {
       const res = await axios.post('/api/auth/logout', {}, {withCredentials: true});
       navigate("/login");
-      alert(res.data.message);
     } catch (error) {
       alert("Logout gagal, coba lagi");
       setShowModal(false);

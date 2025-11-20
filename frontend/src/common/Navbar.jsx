@@ -75,7 +75,7 @@ export function NavbarContentTree({ text, path, icon }) {
       <li className="mx-2 my-1">
         <div className={`flex flex-row rounded-md justify-between transition-colors ${isActive || isCourse || isQuiz  ? "bg-[#6395EE] text-zinc-100 font-regular" : "font-regular text-stone-400 hover:bg-[#CBCBCF] hover:text-stone-700"}`}>
           <NavLink to={path} end className="flex flex-row items-center gap-4 rounded-md cursor-pointer py-2 pl-4 items-center text-md flex-grow">
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row gap-4 items-center">
               <div>{icon}</div>
               <span>{text}</span>
             </div>

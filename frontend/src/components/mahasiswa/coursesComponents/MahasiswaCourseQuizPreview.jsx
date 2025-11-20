@@ -1,5 +1,3 @@
-
-
 import { FiArrowUpLeft } from "react-icons/fi"
 import { NavLink, useNavigate } from "react-router"
 
