@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"fmt"
+	"errors"
 	"net/http"
 	"backend/db"
+	"backend/utils"
 	"backend/models"
 	"backend/services"
-
+	"gorm.io/gorm"
+	"golang.org/x/crypto/bcrypt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,26 +35,39 @@ func Login(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email dan password harus diisi"})
+		c.Error(utils.NewApiError(http.StatusBadRequest, fmt.Errorf("Username and Password is Required!")))
 		return
 	}
 
-	result := db.DB.Where("email = ? AND password = ?", req.Email, req.Password).First(&user)
-	if result.Error != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email atau Password Salah!"})
-		return
+	if err := db.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+    // if userNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+        c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Incorrect Email or Password!")))
+        return
+    }
+		
+    c.Error(err)
+    return
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+
+	if err != nil {
+			c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Incorrect Email or Password!")))
+			return
 	}
 
 	token, err := services.GenerateToken(user)
+	
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token"})
+		c.Error(utils.NewApiError(http.StatusInternalServerError, fmt.Errorf("Login Failed, Server is Busy!")))
 		return
 	}
 
 	c.SetCookie("auth_token", token, 7200, "/", "", false, true)
 
 	c.JSON(http.StatusOK, LoginResponse{
-		Message: "Login berhasil",
+		Message: "Login Success!",
 		User: UserData{
 			Email: user.Email,
 			Role:  user.Role,
@@ -63,13 +80,13 @@ func Login(c *gin.Context) {
 func GetMe(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Sorry! You are not authorized to access this page!")))
 		return
 	}
 
 	var user models.User
 	if err := db.DB.Where("id = ?", userID).First(&user).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User tidak ditemukan"})
+		c.Error(utils.NewApiError(http.StatusNotFound, fmt.Errorf("Unable to Get User Data, Please Relogin!")))
 		return
 	}
 
@@ -83,5 +100,5 @@ func GetMe(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	c.SetCookie("auth_token", "", -1, "/", "", false, true)
-	c.JSON(http.StatusOK, gin.H{"message": "Logout berhasil"})
+	c.JSON(http.StatusOK, gin.H{"message": "Logout Completed!"})
 }

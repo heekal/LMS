@@ -13,11 +13,22 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login'; 
+    if (error.response) {
+      const status = error.response.status;
+      // Token Expired / Belum Login (401)
+      if (status === 401) {
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login'; 
+          alert("Section Expired, Please Relogin!.");
+        }
+      }
+
+      // Kena Rate Limit (429)
+      if (status === 429) {
+        console.warn("Too many requests! Slow down.");
       }
     }
+    
     return Promise.reject(error);
   }
 );

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"backend/models"
+	"backend/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,18 +14,17 @@ func HandleQuizLanding (c *gin.Context) {
 	_, exists := c.Get("user_id")
 
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Sorry you are not authorized to access this page!")))
 		return
 	}
 
 	quizUuid := c.Query("id")
-
 	result, err := models.GetQuizLanding(quizUuid)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error" : err.Error()})
-		return
-	}
+		c.Error(utils.NewApiError(http.StatusInternalServerError, fmt.Errorf("Internal Server Error")))
+		return	
+	}	
 
 	c.JSON(http.StatusOK, gin.H{"data": result })
 }
@@ -34,16 +34,15 @@ func ShowQuizQuestions (c *gin.Context) {
 	quizUuid := c.Query("id")
 
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Sorry you are not authorized to access this page!")))
 		return
 	}
 
 	result, err := models.GetQuizQuestions(quizUuid)
-
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error" : err.Error()})
-		return
-	}
+		c.Error(utils.NewApiError(http.StatusInternalServerError, fmt.Errorf("Internal Server Error")))
+		return	
+	}	
 
 	c.JSON(http.StatusOK, gin.H{"data": result })
 }
@@ -51,7 +50,7 @@ func ShowQuizQuestions (c *gin.Context) {
 func HandleQuizSubmitPayload (c *gin.Context) {
 	userId, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Sorry you are not authorized to access this page!")))
 		return
 	}
 

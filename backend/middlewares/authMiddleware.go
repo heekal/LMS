@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"backend/db"
 	"backend/services"
+	"backend/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -13,14 +15,14 @@ func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString, err := c.Cookie("auth_token")
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak ditemukan"})
+			c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Token Not Found, Please Relogin!")))
 			c.Abort()
 			return
 		}
 
 		claims, err := services.ValidateToken(tokenString)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak valid"})
+			c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Token Invalid, Please Relogin!")))
 			c.Abort()
 			return
 		}
@@ -38,7 +40,7 @@ func RoleRequired(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, exists := c.Get("user_role")
 		if !exists {
-			c.JSON(http.StatusForbidden, gin.H{ "error": "Role tidak ditemukan" })
+			c.Error(utils.NewApiError(http.StatusForbidden, fmt.Errorf("Role Not Found, Please Relogin!")))
 			c.Abort()
 			return
 		}
@@ -53,7 +55,7 @@ func RoleRequired(allowedRoles ...string) gin.HandlerFunc {
 		}
 
 		if !allowed {
-			c.JSON(http.StatusForbidden, gin.H{ "error": "Akses ditolak. Anda tidak punya hak akses" })
+			c.Error(utils.NewApiError(http.StatusForbidden, fmt.Errorf("Access Denied, You Are Not Allowed")))
 			c.Abort()
 			return
 		}
@@ -77,7 +79,7 @@ func IsEnrolled() gin.HandlerFunc {
 		`, userId, uuid).Scan(&isEnrolled).Error
 
 		if err != nil || !isEnrolled {
-			c.JSON(http.StatusForbidden, gin.H{"error": "You are not enrolled in this course"})
+			c.Error(utils.NewApiError(http.StatusForbidden, fmt.Errorf("You Are Not Enrolled in This Course!")))
 			c.Abort()
 			return
 		}

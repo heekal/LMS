@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 	"os"
-	"backend/controllers"
 	"backend/db"
-	"backend/middleware"
 	"backend/services"
+	"backend/controllers"
+	"backend/middlewares"
 	"backend/controllers/mahasiswaController"
 
 	"github.com/gin-contrib/cors"
@@ -20,17 +20,20 @@ func main() {
 	}
 
 	db.Connect()
-
 	services.StartScheduler()
 	
 	r := gin.Default()
-
+	
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
 		AllowCredentials: true,
 	}))
+
+	r.Use(middleware.RateLimiter())
+	r.Use(middleware.ErrorMiddleware())
+	r.Use(middleware.SecurityHeaders())
 
 	api := r.Group("/api")
 	{

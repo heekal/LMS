@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -101,7 +100,7 @@ func GetQuizLanding (quizUuid any) ([]QuizLandingInfo, error) {
 		WHERE quizzes.uuid = ?`, quizUuid).Scan(&list).Error
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Internal Server Error")
 	}
 
 	return list, nil
@@ -130,7 +129,7 @@ func GetQuizScore (userId any) ([]QuizScorePerSubject, error) {
 	`
 
 	if err := db.DB.Raw(query, userId).Scan(&rows).Error; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Internal Server Error")
 	}
 
 	courseMap := make(map[string][]QuizScore)
@@ -162,10 +161,10 @@ func GetQuizQuestions (quizUuid any) (*QuizData, error) {
 		Scan(&quizInfo).Error
 	
 	if err != nil {
-		return nil, fmt.Errorf("gagal ambil quiz: %v", err)
+		return nil, fmt.Errorf("Internal Server Error")
 	}
 	if quizInfo.ID == 0 {
-		return nil, errors.New("quiz tidak ditemukan")
+		return nil, fmt.Errorf("Internal Server Error")
 	}
 
 	var rows []rawQuestionRow
@@ -185,7 +184,7 @@ func GetQuizQuestions (quizUuid any) (*QuizData, error) {
 		ORDER BY quizquestions.question_order`, quizUuid).Scan(&rows).Error
 
 	if err != nil {
-		return nil, fmt.Errorf("gagal ambil data quiz: %v", err)
+		return nil, fmt.Errorf("Internal Server Error")
 	}
 
 	questionMap := make(map[int]*SingleQuestion)
@@ -233,7 +232,7 @@ func CheckQuizId (userId any, quizId any) (bool, error) {
 		)`, userId, quizId).Scan(&isValid).Error
 
 	if err != nil {
-		return false, fmt.Errorf("gagal ambil data quiz: %v", err)
+		return false, fmt.Errorf("Internal Server Error")
 	}
 
 	return isValid, err
@@ -293,7 +292,7 @@ func HandleQuizGrading(userId any, quizId any, answers []QuizAnswer) error {
 	`, userId, quizId, finalScore).Error
 
 	if err != nil {
-		return fmt.Errorf("Database Error")
+		return fmt.Errorf("Internal Server Error")
 	}
 
 	return nil
