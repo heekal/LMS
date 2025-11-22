@@ -1,0 +1,3 @@
+# Anggap file sql dan dump sebagai binary, jangan ubah line ending!
+*.sql binary
+*.dump binary
