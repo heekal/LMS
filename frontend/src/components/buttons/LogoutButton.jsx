@@ -10,16 +10,26 @@ export function LogoutButton() {
 
   const handleLogout = async () => {
     setIsLoading(true);
+
     try {
       const res = await axios.post('/api/auth/logout', {}, {withCredentials: true});
-      navigate("/login");
+      const messageFromServer = res.data.message;
+
+      handleLogoutSucess(messageFromServer);
     } catch (error) {
-      alert("Logout gagal, coba lagi");
+      alert("Logout failed, wait for another seconds!");
       setShowModal(false);
-    } finally {
       setIsLoading(false);
     }
   };
+
+  const handleLogoutSucess=(msg)=>{
+    alert(msg);
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+  }
 
   return (
     <>
@@ -44,7 +54,17 @@ export function LogoutButton() {
               </h3>
 
               <div className="flex flex-col gap-2 pb-2 w-full px-2">
-              <button onClick={handleLogout} className=" cursor-pointer text-xs text-black p-2 bg-green-200 hover:bg-green-300 rounded-md" disabled={isLoading}>
+              <button 
+                onClick={handleLogout} 
+                className={`
+                  text-xs text-black p-2 rounded-md
+                  ${isLoading
+                    ? "bg-gray-200 cursor-disable"
+                    : "bg-green-200 hover:bg-green-300 cursor:pointer"
+                  }  
+                `}
+                disabled={isLoading}
+              >
                 {isLoading ? "Logging out..." : "Logout"}
               </button>
               <button onClick={() => setShowModal(false)} className="p-2 rounded-md text-xs text-slate-500 hover:text-slate-700 cursor-pointer border-stone-300 hover:border-stone-500 border" disabled={isLoading}>
