@@ -89,7 +89,7 @@ export default function Login() {
 
       {showLoginMsg && (
         <div className="fixed top-10">
-          <div className="px-2 py-1 border border-green-500 bg-green-200 rounded-md text-xs text-green-900">Hello! {succesMsg}</div>
+          <div className="px-2 py-1 border border-green-500 bg-green-200 rounded-md text-xs text-green-900">Hello! {successMsg}</div>
         </div>
       )}
     </div>
