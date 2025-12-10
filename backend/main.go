@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"backend/db"
 	"backend/services"
 	"backend/controllers"
@@ -28,7 +29,7 @@ func main() {
 	r := gin.Default()
 	
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,,
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
 		AllowCredentials: true,
@@ -39,6 +40,8 @@ func main() {
 	r.Use(middleware.SecurityHeaders())
 
 	api := r.Group("/api")
+	api.GET("/health", services.HealthCheck)
+
 	{
 		auth := api.Group("/auth")
 		{
