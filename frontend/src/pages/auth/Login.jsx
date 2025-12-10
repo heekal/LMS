@@ -6,7 +6,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [succesMsg, setSuccessMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [showLoginMsg, setShowLoginMsg] = useState(false);
   const [showErrLoginMsg, setShowErrLoginMsg] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
