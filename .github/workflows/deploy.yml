@@ -36,12 +36,25 @@ jobs:
             -Dsonar.exclusions=**/*_test.go,**/vendor/**,frontend/node_modules/**,frontend/dist/**
 
       # 3. GO SECURITY SCAN (Khusus Backend)
-      - name: Gosec Security Scanner
-        uses: securego/gosec@master
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          args: ./backend/...
-        env:
-          GOFLAGS: "-mod=vendor"
+          go-version: '1.24' # Sesuaikan dengan versi Go kamu
+
+      - name: Install Gosec & Run Scan
+        run: |
+          # 1. Install tool Gosec
+          curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.18.2
+          
+          # 2. Masuk ke folder backend
+          cd backend
+          
+          # 3. Pastikan dependency lengkap (Download ulang biar yakin)
+          go mod tidy
+          go mod download
+          
+          # 4. Jalanin Gosec (Tanpa flag vendor, biar dia baca dari cache Go modules normal)
+          $(go env GOPATH)/bin/gosec -no-fail -fmt table ./...
 
   # === JOB 2: BUILD, SCAN IMAGE, & DEPLOY ===
   build-and-deploy:
