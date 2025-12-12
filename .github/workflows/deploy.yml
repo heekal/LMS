@@ -40,6 +40,8 @@ jobs:
         uses: securego/gosec@master
         with:
           args: ./backend/...
+        env:
+          GOFLAGS: "-mod=vendor"
 
   # === JOB 2: BUILD, SCAN IMAGE, & DEPLOY ===
   build-and-deploy:
