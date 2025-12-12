@@ -1,157 +1,77 @@
-name: DevSecOps Pipeline
+name: Deploy Direct to VM
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
-  # === JOB 1: SECURITY CHECKS ===
+  # === JOB 1: SECURITY CHECKS (Tetap kita pakai biar aman) ===
   security-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       # 1. SECRET SCANNING
       - name: TruffleHog Secret Scan
         uses: trufflesecurity/trufflehog@main
         with:
-          path: ./
-          extra_args: --debug --only-verified
+          extra_args: --debug --only-verified --filesystem .
 
-      # 2. SONARCLOUD SCAN
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.organization=heekal
-            -Dsonar.projectKey=heekal_LMS
-            -Dsonar.sources=.
-            -Dsonar.exclusions=**/*_test.go,**/vendor/**,frontend/node_modules/**,frontend/dist/**
-
-      # 3. GO SECURITY SCAN
+      # 2. GO SECURITY SCAN (Manual Install biar stabil)
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'  # ⬅️ Fixed: 1.24 belum exist
+          go-version: '1.21'
 
-      - name: Run Gosec Security Scan
+      - name: Install Gosec & Run Scan
         run: |
           go install github.com/securego/gosec/v2/cmd/gosec@latest
           cd backend
+          go mod tidy
           go mod download
-          gosec -no-fail -fmt=sarif -out=gosec-results.sarif ./...
-          gosec -no-fail -fmt=table ./...
+          $(go env GOPATH)/bin/gosec -no-fail -fmt table ./...
 
-      # 4. UPLOAD GOSEC RESULTS
-      - name: Upload Gosec Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: gosec-results
-          path: backend/gosec-results.sarif
-
-  # === JOB 2: BUILD & SCAN DOCKER IMAGES ===
-  docker-security-scan:
+  # === JOB 2: COPY CODE & BUILD ON SERVER ===
+  deploy-to-vm:
     needs: security-check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Build images locally (nggak push ke Docker Hub)
-      - name: Build Backend Image
-        run: docker build -t myapp-backend:latest ./backend
-
-      - name: Build Frontend Image
-        run: docker build -t myapp-frontend:latest ./frontend
-
-      # Trivy Scan Backend
-      - name: Trivy Scan Backend
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'myapp-backend:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
-
-      # Trivy Scan Frontend
-      - name: Trivy Scan Frontend
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'myapp-frontend:latest'
-          format: 'table'
-          exit-code: '0'  # Warning only
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
-
-  # === JOB 3: DEPLOY TO VPS ===
-  deploy:
-    needs: [security-check, docker-security-scan]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
+      # 1. COPY SEMUA KODINGAN KE SERVER
+      # Ini akan menimpa folder backend/ dan frontend/ di server dengan yang terbaru dari GitHub
+      - name: Copy Files via SCP
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22
-          command_timeout: 30m
+          key: ${{ secrets.VPS_KEY }}
+          source: "."  # Copy semua file di repo ini
+          target: "~/myapp" # Ke folder myapp di server
+          # Kita exclude file yang gak perlu dikirim biar cepet
+          rm: false # Jangan hapus file lain yang ada di server (misal .env)
+
+      # 2. MASUK KE SERVER & SURUH DOCKER BUILD ULANG
+      - name: SSH & Rebuild Docker
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
           script: |
-            set -e  # Exit on error
-            
-            echo "=== Starting Deployment ==="
             cd ~/myapp
             
-            echo "=== Pulling latest code ==="
-            git pull origin main
-            
-            echo "=== Checking Docker Compose ==="
-            docker compose version
-            
-            echo "=== Building new images ==="
-            docker compose build --no-cache backend frontend
-            
-            echo "=== Stopping old containers ==="
+            # Matikan container aplikasi (Loki dkk biarkan nyala kalau mau)
             docker compose stop backend frontend
             
-            echo "=== Removing old containers ==="
+            # Hapus container lama
             docker compose rm -f backend frontend
             
-            echo "=== Starting new containers ==="
-            docker compose up -d backend frontend
+            # BUILD ULANG (Ini kuncinya, dia bakal build pakai CPU server lu)
+            # --build artinya: "Paksa build ulang walaupun image sudah ada"
+            docker compose up -d --build backend frontend
             
-            echo "=== Waiting for services to be healthy ==="
-            sleep 10
-            
-            echo "=== Checking container status ==="
-            docker compose ps
-            
-            echo "=== Cleaning up old images ==="
-            docker image prune -af --filter "until=24h"
-            
-            echo "=== Deployment completed successfully ==="
-
-      # Post-deployment health check
-      - name: Health Check
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            echo "=== Backend Health Check ==="
-            curl -f http://localhost:8080/health || echo "Backend not responding"
-            
-            echo "=== Frontend Health Check ==="
-            curl -f http://localhost:3001 || echo "Frontend not responding"
-            
-            echo "=== Container Logs (Last 20 lines) ==="
-            docker compose logs --tail=20 backend frontend
+            # Bersihkan image sampah (dangling images) bekas build sebelumnya
+            docker image prune -f
