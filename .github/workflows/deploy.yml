@@ -24,7 +24,7 @@ jobs:
       # 2. SONARQUBE / SONARCLOUD SCAN (Code Quality)
       # Pastikan sudah daftar di SonarCloud.io dan set SONAR_TOKEN
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarcloud-github-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Bawaan GitHub (gak perlu setting)
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Wajib setting di Secrets
