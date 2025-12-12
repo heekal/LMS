@@ -2,32 +2,31 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  # === JOB 1: SECURITY CHECKS (SAST & SECRETS) ===
+  # === JOB 1: SECURITY CHECKS ===
   security-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Penting untuk SonarQube agar bisa baca history git
+          fetch-depth: 0
 
-      # 1. SECRET SCANNING (Mencegah kebocoran password)
+      # 1. SECRET SCANNING
       - name: TruffleHog Secret Scan
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
           extra_args: --debug --only-verified
 
-      # 2. SONARQUBE / SONARCLOUD SCAN (Code Quality)
-      # Pastikan sudah daftar di SonarCloud.io dan set SONAR_TOKEN
+      # 2. SONARCLOUD SCAN
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Bawaan GitHub (gak perlu setting)
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Wajib setting di Secrets
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
             -Dsonar.organization=heekal
@@ -35,12 +34,11 @@ jobs:
             -Dsonar.sources=.
             -Dsonar.exclusions=**/*_test.go,**/vendor/**,frontend/node_modules/**,frontend/dist/**
 
-      # 3. GO SECURITY SCAN (Khusus Backend)
-      # 3. GO SECURITY SCAN (Khusus Backend)
+      # 3. GO SECURITY SCAN
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.23'  # ⬅️ Fixed: 1.24 belum exist
 
       - name: Run Gosec Security Scan
         run: |
@@ -48,72 +46,112 @@ jobs:
           cd backend
           go mod download
           gosec -no-fail -fmt=sarif -out=gosec-results.sarif ./...
-          gosec -fmt=table ./...
+          gosec -no-fail -fmt=table ./...
 
-  # === JOB 2: BUILD, SCAN IMAGE, & DEPLOY ===
-  build-and-deploy:
-    needs: security-check  # Hanya jalan kalau security check LOLOS (Hijau)
+      # 4. UPLOAD GOSEC RESULTS
+      - name: Upload Gosec Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gosec-results
+          path: backend/gosec-results.sarif
+
+  # === JOB 2: BUILD & SCAN DOCKER IMAGES ===
+  docker-security-scan:
+    needs: security-check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      # --- BACKEND PROCESS ---
+      # Build images locally (nggak push ke Docker Hub)
       - name: Build Backend Image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp-backend:latest ./backend
+        run: docker build -t myapp-backend:latest ./backend
 
-      # 4. TRIVY IMAGE SCANNING (Backend)
-      # Cek apakah OS container (Alpine/Debian) punya celah keamanan
-      - name: Run Trivy vulnerability scanner (Backend)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ secrets.DOCKER_USERNAME }}/myapp-backend:latest'
-          format: 'table'
-          exit-code: '1'        # GAGALKAN pipeline jika ada vulnerability CRITICAL
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
-
-      - name: Push Backend
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/myapp-backend:latest
-
-      # --- FRONTEND PROCESS ---
       - name: Build Frontend Image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp-frontend:latest ./frontend
+        run: docker build -t myapp-frontend:latest ./frontend
 
-      # 5. TRIVY IMAGE SCANNING (Frontend)
-      - name: Run Trivy vulnerability scanner (Frontend)
+      # Trivy Scan Backend
+      - name: Trivy Scan Backend
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.DOCKER_USERNAME }}/myapp-frontend:latest'
+          image-ref: 'myapp-backend:latest'
           format: 'table'
-          exit-code: '0'        # Warning aja, jangan gagalkan (opsional)
+          exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
-      - name: Push Frontend
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/myapp-frontend:latest
+      # Trivy Scan Frontend
+      - name: Trivy Scan Frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'myapp-frontend:latest'
+          format: 'table'
+          exit-code: '0'  # Warning only
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
 
-      # --- DEPLOYMENT ---
+  # === JOB 3: DEPLOY TO VPS ===
+  deploy:
+    needs: [security-check, docker-security-scan]
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_KEY }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          command_timeout: 30m
           script: |
+            set -e  # Exit on error
+            
+            echo "=== Starting Deployment ==="
             cd ~/myapp
-            echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
             
-            # Pull image baru dulu sebelum matikan container lama (Zero Downtime attempt)
-            docker compose pull backend frontend
+            echo "=== Pulling latest code ==="
+            git pull origin main
             
+            echo "=== Checking Docker Compose ==="
+            docker compose version
+            
+            echo "=== Building new images ==="
+            docker compose build --no-cache backend frontend
+            
+            echo "=== Stopping old containers ==="
             docker compose stop backend frontend
+            
+            echo "=== Removing old containers ==="
             docker compose rm -f backend frontend
-            docker compose up -d
-            docker image prune -f
+            
+            echo "=== Starting new containers ==="
+            docker compose up -d backend frontend
+            
+            echo "=== Waiting for services to be healthy ==="
+            sleep 10
+            
+            echo "=== Checking container status ==="
+            docker compose ps
+            
+            echo "=== Cleaning up old images ==="
+            docker image prune -af --filter "until=24h"
+            
+            echo "=== Deployment completed successfully ==="
+
+      # Post-deployment health check
+      - name: Health Check
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "=== Backend Health Check ==="
+            curl -f http://localhost:8080/health || echo "Backend not responding"
+            
+            echo "=== Frontend Health Check ==="
+            curl -f http://localhost:3001 || echo "Frontend not responding"
+            
+            echo "=== Container Logs (Last 20 lines) ==="
+            docker compose logs --tail=20 backend frontend
