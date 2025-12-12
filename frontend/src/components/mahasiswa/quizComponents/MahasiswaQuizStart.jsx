@@ -61,7 +61,7 @@ export default function MahasiswaQuizStart() {
     };
 
     try {
-      const res = await axios.post(`/api/mahasiswa/quiz/post?id=${id}`, payload);
+      const res = await axios.post(`/mahasiswa/quiz/post?id=${id}`, payload);
       setSubmitted(res.data.message);
     } catch (error) {
       setErrorSubmitMessage(error.response.data.error);

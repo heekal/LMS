@@ -7,7 +7,7 @@ export default function MahasiswaGradeTable() {
   useEffect(() => {
     const fetchScores = async () => {
       try {
-        const res = await axios.get("api/mahasiswa/scores", { withCredentials: true });
+        const res = await axios.get("/mahasiswa/scores", { withCredentials: true });
         setScores(res.data.Data);
       } catch (error) {
         alert(error.response?.data?.error || "Failed to fetch data");

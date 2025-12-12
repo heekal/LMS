@@ -13,7 +13,7 @@ export default function MahasiswaCourseTemplate() {
   useEffect(() => {
     const fetchetSubject = async() => {
       try {
-        const res = await axios.get(`/api/mahasiswa/course/${id}`, { withCredentials: true});
+        const res = await axios.get(`/mahasiswa/course/${id}`, { withCredentials: true});
 
         setInfo(res.data.data);
       } catch (error) {

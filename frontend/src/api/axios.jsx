@@ -15,17 +15,14 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response) {
       const status = error.response.status;
-      // Token Expired / Belum Login (401)
+
+      // 401: Unauthorized
       if (status === 401) {
         if (window.location.pathname !== '/login') {
-          window.location.href = '/login'; 
-          alert("Section Expired, Please Relogin!.");
+          window.location.href = '/login';
+          // Ganti alert pake toast biar elegan
+          alert("Session Expired, Please Relogin!");
         }
-      }
-
-      // Kena Rate Limit (429)
-      if (status === 429) {
-        console.warn("Too many requests! Slow down.");
       }
     }
     

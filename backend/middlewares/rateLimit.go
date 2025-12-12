@@ -7,7 +7,7 @@ import (
 )
 
 // 5 req / sec, supaya gak overload
-var limiter = rate.NewLimiter(2, 10)
+var limiter = rate.NewLimiter(5, 10)
 
 func RateLimiter() gin.HandlerFunc {
 	return func(c *gin.Context) {

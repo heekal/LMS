@@ -12,7 +12,7 @@ export function LogoutButton() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('/api/auth/logout', {}, {withCredentials: true});
+      const res = await axios.post('/auth/logout', {}, {withCredentials: true});
       const messageFromServer = res.data.message;
 
       handleLogoutSucess(messageFromServer);

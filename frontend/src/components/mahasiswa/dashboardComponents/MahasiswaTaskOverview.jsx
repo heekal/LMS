@@ -16,7 +16,7 @@ export function MahasiswaTaskOverview({ owner }) {
   useEffect(() => {
     const fetchedTask = async() => {
       try {
-        const res = await axios.get('/api/mahasiswa/dashboard/tasks', { withCredentials : true});
+        const res = await axios.get('/mahasiswa/dashboard/tasks', { withCredentials : true});
         setTasks(res.data.Data);
       } catch (error) {
         alert(error.response.data.error);

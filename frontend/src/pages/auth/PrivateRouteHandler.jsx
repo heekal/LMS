@@ -7,7 +7,7 @@ export default function PrivateRoute({ children, role }) {
 
   useEffect(() => {
     axios
-      .get("/api/me", { withCredentials: true })
+      .get("/me", { withCredentials: true })
       .then((res) => setAuthState({ user: res.data, loading: false }))
       .catch(() => setAuthState({ user: null, loading: false }));
   }, []);
@@ -15,7 +15,7 @@ export default function PrivateRoute({ children, role }) {
   if (authState.loading)
     return (
       <div className="flex h-screen items-center justify-center text-gray-700">
-        Checking authentication...
+        Loading
       </div>
     );
 

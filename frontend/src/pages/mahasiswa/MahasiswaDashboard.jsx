@@ -21,7 +21,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchName = async () => {
       try {
-        const res = await axios.get("/api/mahasiswa/dashboard", { withCredentials:true });
+        const res = await axios.get("/mahasiswa/dashboard", { withCredentials:true });
         setName(res.data.name);
       } catch (error) {
         console.error("Gagal Ambil Nama User:", error);

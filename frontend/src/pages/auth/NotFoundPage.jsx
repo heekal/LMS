@@ -5,7 +5,7 @@ export default function NotFoundPage() {
   const navigate = useNavigate();
 
   const handleBackToDashboard = () => {
-    navigate("/mahasiswa/");
+    navigate("/mahasiswa");
   };
 
   return(

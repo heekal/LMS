@@ -21,7 +21,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/login', {email, password}, {withCredentials: true});
+      const response = await axios.post('/auth/login', {email, password}, {withCredentials: true});
       handleSuccessLogin(response.data.user.name);
     } catch (error) {
       const errorMessage = error.response?.data?.error || "Internal Server Error, Please Wait for Another Minutes!";

@@ -17,7 +17,7 @@ export default function MahasiswaQuizLanding() {
   useEffect(() => {
     const fetchQuizLanding = async() => {
       try {
-        const res = await axios.get(`api/mahasiswa/quiz/view?id=${id}`);
+        const res = await axios.get(`/mahasiswa/quiz/view?id=${id}`);
         setQuiz(res.data.data[0])
       } catch (error) {
         setError(error.response?.data?.error);

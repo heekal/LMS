@@ -52,7 +52,7 @@ export function NavbarContentTree({ text, path, icon }) {
     const courseId = searchParams.get("id");
     const fetchCourse = async () => {
       try {
-        const res = await axios.get("/api/mahasiswa/navbar", { withCredentials: true });
+        const res = await axios.get("/mahasiswa/navbar", { withCredentials: true });
         setCourses(res.data.courses);
       } catch (error) {
         console.error(error.response?.data?.error || error.message);
