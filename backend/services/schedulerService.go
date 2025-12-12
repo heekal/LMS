@@ -8,9 +8,12 @@ import (
 func StartScheduler() {
   s := gocron.NewScheduler(time.UTC)
 
-  s.Every(1).Hour().Do(func() {
-    AutoGradeExpiredQuizzes()
+  _, err := s.Every(1).Hour().Do(func() {
+      AutoGradeExpiredQuizzes()
   })
+  if err != nil {
+      log.Printf("Failed to schedule auto-grading: %v", err)
+  }
 
   s.StartAsync()
 }

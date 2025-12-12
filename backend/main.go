@@ -83,6 +83,9 @@ func main() {
 
 	port := os.Getenv("APP_PORT")
 
+	// ✅ SESUDAH
 	log.Printf("Server running on http://localhost:%s\n", port)
-	r.Run(":" + port)
+	if err := r.Run(":" + port); err != nil {
+			log.Fatalf("Server failed to start: %v", err)
+	}
 }
