@@ -40,7 +40,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'  # ⚠️ Go 1.24 belum rilis! Pakai 1.23 atau 1.22
+          go-version: '1.24'
 
       - name: Run Gosec Security Scan
         run: |
