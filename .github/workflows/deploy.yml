@@ -28,6 +28,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Bawaan GitHub (gak perlu setting)
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Wajib setting di Secrets
+        with:
+          -Dsonar.organization=kal
+          -Dsonar.projectKey=heekal_LMS
+          -Dsonar.sources=.
+          -Dsonar.exclusions=**/*_test.go,**/vendor/**,frontend/node_modules/**,frontend/dist/**
 
       # 3. GO SECURITY SCAN (Khusus Backend)
       - name: Gosec Security Scanner
