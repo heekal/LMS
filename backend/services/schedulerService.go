@@ -3,6 +3,7 @@ package services
 import (
   "github.com/go-co-op/gocron"
   "time"
+  "log"
 )
 
 func StartScheduler() {
