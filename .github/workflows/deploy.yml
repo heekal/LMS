@@ -14,15 +14,14 @@ jobs:
 
       # 1. SECRET SCANNING
       - name: TruffleHog Secret Scan
-        uses: trufflesecurity/trufflehog@main
-        with:
-          extra_args: --debug --only-verified --filesystem .
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/pwd" trufflesecurity/trufflehog:latest filesystem /pwd --only-verified --fail
 
       # 2. GO SECURITY SCAN (Manual Install biar stabil)
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.24'
 
       - name: Install Gosec & Run Scan
         run: |
