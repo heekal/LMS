@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"strings"
 	"net/http"
 	"backend/db"
 	"backend/services"
