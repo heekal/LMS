@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"string"
 	"net/http"
 	"backend/db"
 	"backend/services"
@@ -12,29 +13,42 @@ import (
 )
 
 func AuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tokenString, err := c.Cookie("auth_token")
-		if err != nil {
-			c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Token Not Found, Please Relogin!")))
-			c.Abort()
-			return
-		}
+  return func(c *gin.Context) {
+    var tokenString string
 
-		claims, err := services.ValidateToken(tokenString)
-		if err != nil {
-			c.Error(utils.NewApiError(http.StatusUnauthorized, fmt.Errorf("Token Invalid, Please Relogin!")))
-			c.Abort()
-			return
-		}
+    // PRIORITAS: Bearer Token (ZAP / CI / API)
+    authHeader := c.GetHeader("Authorization")
+    if strings.HasPrefix(authHeader, "Bearer ") {
+      tokenString = strings.TrimPrefix(authHeader, "Bearer ")
+    } else {
+      // FALLBACK: Cookie (Browser)
+      cookie, err := c.Cookie("auth_token")
+      if err != nil {
+        c.AbortWithStatusJSON(401, gin.H{
+          "error": "Token not found",
+        })
+        return
+      }
+      tokenString = cookie
+    }
 
-		c.Set("user_id", claims.UserID)
-		c.Set("user_email", claims.Email)
-		c.Set("user_role", claims.Role)
-		c.Set("user_name", claims.Name)
+    claims, err := services.ValidateToken(tokenString)
+    if err != nil {
+      c.AbortWithStatusJSON(401, gin.H{
+        "error": "Invalid or expired token",
+      })
+      return
+    }
 
-		c.Next()
-	}
+    c.Set("user_id", claims.UserID)
+    c.Set("user_email", claims.Email)
+    c.Set("user_role", claims.Role)
+    c.Set("user_name", claims.Name)
+
+    c.Next()
+  }
 }
+
 
 func RoleRequired(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
