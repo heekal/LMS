@@ -5,9 +5,9 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # === JOB 1: SECURITY CHECKS (Di VM Self-Hosted) ===
+  # === JOB 1: SECURITY CHECKS (Jalan di Cloud GitHub biar hemat resource VM) ===
   security-check:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -17,103 +17,118 @@ jobs:
         run: |
           docker run --rm -v "${{ github.workspace }}:/pwd" trufflesecurity/trufflehog:latest filesystem /pwd --only-verified --fail
 
-      # 2. GO SECURITY SCAN (Gosec)
+      # 2. GO SECURITY SCAN (Gosec - Manual Install)
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
       - name: Install Gosec & Run Scan
         run: |
-          # Cek apakah gosec sudah terinstall
-          if ! command -v gosec &> /dev/null; then
-            go install github.com/securego/gosec/v2/cmd/gosec@latest
-          fi
-          
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
           cd backend
           go mod tidy
           go mod download
           $(go env GOPATH)/bin/gosec -no-fail -fmt table ./...
 
       # 3. VULNERABILITY SCAN (Trivy - Filesystem)
+      # Cek apakah ada library usang/berbahaya di package.json atau go.mod
       - name: Trivy FS Scan
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/scan \
-            aquasecurity/trivy:latest \
-            fs /scan \
-            --severity CRITICAL,HIGH \
-            --exit-code 0 \
-            --format table
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+          format: 'table'
+          exit-code: '0' # Warning dulu, jangan gagalkan build (ganti 1 kalau mau strict)
+          severity: 'CRITICAL,HIGH'
 
-  # === JOB 2: DEPLOY & DAST SCAN (Self-Hosted) ===
-  deploy-and-scan:
-    needs: security-check
-    runs-on: self-hosted
+  # === JOB 2: DEPLOY LANGSUNG DI VM (Self-Hosted) ===
+  deploy-local:
+    needs: security-check  # Tunggu security lolos dulu
+    runs-on: self-hosted   # <--- INI KUNCINYA (Jalan di VM kamu sendiri)
     
     steps:
+      # 1. Runner download kodingan terbaru dari GitHub ke folder runner
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # 2. Pindahkan file dari folder Runner ke folder Aplikasi (~/myapp)
+      # Kita pakai rsync biar rapi (hanya update yang berubah)
       - name: Sync Files to App Directory
         run: |
-          mkdir -p ~/myapp/zap
+          # Buat folder tujuan kalau belum ada
+          mkdir -p ~/myapp
+          
+          # Copy semua file dari workspace runner saat ini ke ~/myapp
+          # exclude .git biar ringan
           rsync -av --progress . ~/myapp --exclude .git
+          
+          # Fix permission (takutnya runner user beda sama docker user)
+          chmod +x ~/myapp/backend/main.go 2>/dev/null || true
 
+      # 3. Build & Restart Docker (Langsung perintah lokal)
       - name: Rebuild & Restart Docker
         run: |
           cd ~/myapp
+          
           echo "🚀 Memulai Deployment Lokal..."
           
-          # Stop & remove old containers
+          # Matikan container lama
           docker compose stop backend frontend || true
           docker compose rm -f backend frontend || true
           
-          # Build & start new containers
+          # Build ulang (menggunakan cache lokal VM, jadi lebih cepat)
           docker compose up -d --build backend frontend
           
-          # Cleanup unused images
+          # Bersihkan sampah
           docker image prune -f
           
-          echo "⏳ Menunggu backend siap..."
-          sleep 15
-          
-          # Health check
-          curl -f http://localhost:8080/api/health || echo "Backend belum siap"
+          echo "✅ Deployment Selesai!"
 
-      # ZAP BASELINE SCAN
-      - name: ZAP Baseline Scan
+  # === JOB 3: OWASP ZAP DAST SCAN (Jalan setelah deploy) ===
+  zap-scan:
+    needs: deploy-local  # Tunggu app sudah running
+    runs-on: self-hosted
+    
+    steps:
+      - name: Wait for Application to Start
+        run: |
+          echo "⏳ Menunggu aplikasi siap..."
+          sleep 10
+          
+          # Health check sampai backend ready (max 60 detik)
+          for i in {1..12}; do
+            if curl -sf http://localhost:8080/api/health > /dev/null; then
+              echo "✅ Backend sudah siap!"
+              break
+            fi
+            echo "Retry $i/12..."
+            sleep 5
+          done
+
+      - name: OWASP ZAP Baseline Scan
         run: |
           cd ~/myapp
-          
-          # Pastikan folder zap ada
           mkdir -p zap
           
-          # Run ZAP scan
+          echo "🔍 Memulai OWASP ZAP Security Scan..."
+          
           docker run --rm \
             --network myapp_default \
             -v $(pwd)/zap:/zap/wrk \
             zaproxy/zap-stable \
             zap-baseline.py \
             -t http://backend:8080/api/health \
-            -r baseline-report.html \
-            -I || true
+            -r zap-report-$(date +%Y%m%d-%H%M%S).html \
+            || true
           
-          echo "📊 ZAP Scan selesai!"
-          ls -lh zap/baseline-report.html
+          echo "✅ ZAP Scan selesai! Report ada di ~/myapp/zap/"
 
-      # Optional: Upload report ke GitHub (butuh git push atau artifact)
-      - name: Archive ZAP Report
-        if: always()
-        run: |
-          cd ~/myapp/zap
-          if [ -f baseline-report.html ]; then
-            cp baseline-report.html baseline-report-$(date +%Y%m%d-%H%M%S).html
-            echo "✅ Report disimpan di ~/myapp/zap/"
-          fi
-
-      - name: Show Deployment Status
-        run: |
-          echo "================================"
-          echo "🎉 DEPLOYMENT COMPLETE"
-          echo "================================"
-          docker ps --filter "name=myapp"
-          echo ""
-          echo "📊 ZAP Report: ~/myapp/zap/baseline-report.html"
-          echo "🌐 Frontend: http://localhost:3001"
-          echo "🔧 Backend: http://localhost:8080"
+      - name: Upload ZAP Report as Artifact
+        uses: actions/upload-artifact@v4
+        if: always()  # Upload meskipun ada warning/error
+        with:
+          name: zap-security-report
+          path: ~/myapp/zap/*.html
+          retention-days: 30
