@@ -12,8 +12,6 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  const API_KEY = "kJ9sL!2dP0x#Qw8RZ@1aY";
   
   const handleLogin = async (e) => {
     e.preventDefault();
