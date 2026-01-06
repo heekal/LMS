@@ -9,6 +9,7 @@ func SecurityHeaders() gin.HandlerFunc {
 		c.Header("X-XSS-Protection", "1; mode=block")
 		c.Header("Referrer-Policy", "no-referrer")
 		c.Header("Content-Security-Policy", "default-src 'self'")
+		c.Header("Cross-Origin-Resource-Policy", "same-origin")
 		c.Next()
 	}
 }
