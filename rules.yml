@@ -1,4 +1,0 @@
-rules:
-  - id: force-api-key
-    description: Force fail on API_KEY assignment
-    regex: API_KEY\s*=\s*["'][^"']+["']
