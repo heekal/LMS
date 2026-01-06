@@ -13,6 +13,8 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const API_KEY = "INISENGAJADITAMBAHBIERERRORGES";
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setShowErrLoginMsg(false);
