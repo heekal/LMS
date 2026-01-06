@@ -15,11 +15,13 @@ jobs:
       # 1. SECRET SCANNING (TruffleHog)
       - name: TruffleHog Secret Scan
         run: |
-          docker run --rm -v "${{ github.workspace }}:/pwd" \
-          trufflesecurity/trufflehog:latest \
-          filesystem /pwd \
-          --only-verified=false \
-          --fail
+          docker run --rm \
+            -v "${{ github.workspace }}:/pwd" \
+            -v "${{ github.workspace }}/rules.yml:/rules.yml" \
+            trufflesecurity/trufflehog:latest \
+            filesystem /pwd \
+            --rules /rules.yml \
+            --fail
 
       # 2. GO SECURITY SCAN (Gosec - Manual Install)
       - name: Setup Go
