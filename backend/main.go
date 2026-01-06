@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if godotenv.Load() != nil {
 		log.Println("No .env file found, using system environment variables")
 	}
 
